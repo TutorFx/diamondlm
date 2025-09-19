@@ -2,7 +2,8 @@
 export default defineNuxtConfig({
   modules: [
     '@nuxt/eslint',
-    '@nuxt/ui'
+    '@nuxt/ui',
+    '@nuxtjs/mdc'
   ],
 
   devtools: {
@@ -13,6 +14,10 @@ export default defineNuxtConfig({
 
   routeRules: {
     '/': { prerender: true }
+  },
+
+  experimental: {
+    viewTransition: true
   },
 
   compatibilityDate: '2025-01-15',

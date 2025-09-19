@@ -1,76 +1,197 @@
+<script setup lang="ts">
+import type { DefineComponent } from 'vue'
+import { Chat } from '@ai-sdk/vue'
+import { DefaultChatTransport } from 'ai'
+import type { UIMessage } from 'ai'
+import { useClipboard } from '@vueuse/core'
+import { getTextFromMessage } from '@nuxt/ui/utils/ai'
+import ProseStreamPre from '../components/prose/PreStream.vue'
+
+const input = ref('')
+const loading = ref(false)
+
+const components = {
+  pre: ProseStreamPre as unknown as DefineComponent
+}
+
+const toast = useToast()
+const clipboard = useClipboard()
+const { model } = useModels()
+
+const chat = new Chat({
+  // messages: data.value.messages,
+  transport: new DefaultChatTransport({
+    api: `/api/chats`,
+    body: {
+      model: model.value
+    }
+  }),
+  onFinish(message) {
+    refreshNuxtData('chats')
+  },
+  onError(error) {
+    const { message } = typeof error.message === 'string' && error.message[0] === '{' ? JSON.parse(error.message) : error
+    toast.add({
+      description: message,
+      icon: 'lucide:alert-circle',
+      color: 'error',
+      duration: 0
+    })
+  }
+})
+
+function handleSubmit(e: Event) {
+  e.preventDefault()
+  if (input.value.trim()) {
+    chat.sendMessage({
+      text: input.value
+    })
+    input.value = ''
+  }
+}
+
+watch(chat.messages, (newValue) => {
+  if (!document.startViewTransition) {
+    // Fallback para navegadores sem suporte
+    return
+  }
+  if (newValue.length === 0) {
+    document.startViewTransition(() => {})
+  }
+})
+
+const quickChats = [
+  {
+    label: 'Qual o valor do vale alimentação?',
+    icon: 'lucide:coins'
+  },
+  {
+    label: 'Como funciona o banco de horas?',
+    icon: 'lucide:clock'
+  },
+  {
+    label: 'Resuma o código de vestimenta (dress code)',
+    icon: 'lucide:shirt'
+  },
+  {
+    label: 'Quais são os principais valores da Implanta?',
+    icon: 'lucide:gem'
+  },
+  {
+    label: 'Como funciona o auxílio home office?',
+    icon: 'lucide:home'
+  }
+]
+
+const copied = ref(false)
+
+function copy(e: MouseEvent, message: UIMessage) {
+  clipboard.copy(getTextFromMessage(message))
+
+  copied.value = true
+
+  setTimeout(() => {
+    copied.value = false
+  }, 2000)
+}
+</script>
+
 <template>
-  <div>
-    <UPageHero
-      title="Nuxt Starter Template"
-      description="A production-ready starter template powered by Nuxt UI. Build beautiful, accessible, and performant applications in minutes, not hours."
-      :links="[{
-        label: 'Get started',
-        to: 'https://ui4.nuxt.com/docs/getting-started/installation/nuxt',
-        target: '_blank',
-        trailingIcon: 'i-lucide-arrow-right',
-        size: 'xl'
-      }, {
-        label: 'Use this template',
-        to: 'https://github.com/nuxt-ui-templates/starter',
-        target: '_blank',
-        icon: 'i-simple-icons-github',
-        size: 'xl',
-        color: 'neutral',
-        variant: 'subtle'
-      }]"
-    />
+  <UDashboardPanel id="home" :ui="{ body: 'p-0 sm:p-0' }">
+    <template #header>
+      <DashboardNavbar />
+    </template>
 
-    <UPageSection
-      id="features"
-      title="Everything you need to build modern Nuxt apps"
-      description="Start with a solid foundation. This template includes all the essentials for building production-ready applications with Nuxt UI's powerful component system."
-      :features="[{
-        icon: 'i-lucide-rocket',
-        title: 'Production-ready from day one',
-        description: 'Pre-configured with TypeScript, ESLint, Tailwind CSS, and all the best practices. Focus on building features, not setting up tooling.'
-      }, {
-        icon: 'i-lucide-palette',
-        title: 'Beautiful by default',
-        description: 'Leveraging Nuxt UI\'s design system with automatic dark mode, consistent spacing, and polished components that look great out of the box.'
-      }, {
-        icon: 'i-lucide-zap',
-        title: 'Lightning fast',
-        description: 'Optimized for performance with SSR/SSG support, automatic code splitting, and edge-ready deployment. Your users will love the speed.'
-      }, {
-        icon: 'i-lucide-blocks',
-        title: '100+ components included',
-        description: 'Access Nuxt UI\'s comprehensive component library. From forms to navigation, everything is accessible, responsive, and customizable.'
-      }, {
-        icon: 'i-lucide-code-2',
-        title: 'Developer experience first',
-        description: 'Auto-imports, hot module replacement, and TypeScript support. Write less boilerplate and ship more features.'
-      }, {
-        icon: 'i-lucide-shield-check',
-        title: 'Built for scale',
-        description: 'Enterprise-ready architecture with proper error handling, SEO optimization, and security best practices built-in.'
-      }]"
-    />
+    <template #body>
+      <UContainer v-if="chat.messages.length === 0" class="flex-1 flex flex-col justify-center gap-4 sm:gap-6 py-8">
+        <h1 class="text-3xl sm:text-4xl text-highlighted font-bold">
+          Olá! Como posso te ajudar hoje?
+        </h1>
 
-    <UPageSection>
-      <UPageCTA
-        title="Ready to build your next Nuxt app?"
-        description="Join thousands of developers building with Nuxt and Nuxt UI. Get this template and start shipping today."
-        variant="subtle"
-        :links="[{
-          label: 'Start building',
-          to: 'https://ui4.nuxt.com/docs/getting-started/installation/nuxt',
-          target: '_blank',
-          trailingIcon: 'i-lucide-arrow-right',
-          color: 'neutral'
-        }, {
-          label: 'View on GitHub',
-          to: 'https://github.com/nuxt-ui-templates/starter',
-          target: '_blank',
-          icon: 'i-simple-icons-github',
-          color: 'neutral',
-          variant: 'outline'
-        }]"
-      />
-    </UPageSection>
-  </div>
+        <UChatPrompt
+          v-model="input"
+          :status="loading ? 'streaming' : 'ready'"
+          class="[view-transition-name:chat-prompt]"
+          variant="subtle"
+          @submit="handleSubmit"
+        >
+          <UChatPromptSubmit color="neutral" />
+
+          <template #footer>
+            <ModelSelect v-model="model" />
+          </template>
+        </UChatPrompt>
+
+        <div class="flex flex-wrap gap-2">
+          <UButton
+            v-for="quickChat in quickChats"
+            :key="quickChat.label"
+            :icon="quickChat.icon"
+            :label="quickChat.label"
+            size="sm"
+            color="neutral"
+            variant="outline"
+            class="rounded-full"
+            @click="chat.sendMessage({ text: quickChat.label })"
+          />
+        </div>
+      </UContainer>
+      <UContainer v-else class="flex-1 flex flex-col gap-4 sm:gap-6">
+        <UChatMessages
+          :messages="chat.messages"
+          :status="chat.status"
+          :assistant="{ actions: [{ label: 'Copy', icon: copied ? 'lucide:copy-check' : 'lucide:copy', onClick: copy }] }"
+          class="lg:pt-(--ui-header-height) pb-4 sm:pb-6"
+          :spacing-offset="160"
+        >
+          <template #content="{ message }">
+            <div class="space-y-4">
+              <template v-for="(part, index) in message.parts" :key="`${part.type}-${index}-${message.id}`">
+                <UButton
+                  v-if="part.type === 'reasoning' && part.state !== 'done'"
+                  label="Pensando..."
+                  variant="link"
+                  color="neutral"
+                  class="p-0"
+                  loading
+                />
+              </template>
+              <MDCCached
+                :value="getTextFromMessage(message)"
+                :cache-key="message.id"
+                unwrap="p"
+                :components="components"
+                :parser-options="{ highlight: false }"
+              />
+            </div>
+          </template>
+        </UChatMessages>
+
+        <UChatPrompt
+          v-model="input"
+          :error="chat.error"
+          variant="subtle"
+          class="sticky bottom-0 [view-transition-name:chat-prompt] rounded-b-none z-10"
+          @submit="handleSubmit"
+        >
+          <UChatPromptSubmit
+            :status="chat.status"
+            color="neutral"
+            @stop="chat.stop"
+            @reload="chat.regenerate"
+          />
+
+          <template #footer>
+            <ModelSelect v-model="model" />
+          </template>
+        </UChatPrompt>
+      </UContainer>
+    </template>
+  </UDashboardPanel>
 </template>
+
+<style>
+@view-transition {
+  navigation: auto;
+}
+</style>

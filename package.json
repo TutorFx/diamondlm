@@ -17,8 +17,18 @@
     "nuxt": "^4.1.0"
   },
   "devDependencies": {
+    "@ai-sdk/gateway": "^1.0.24",
+    "@ai-sdk/google": "^2.0.14",
+    "@ai-sdk/vue": "^2.0.47",
+    "@langchain/textsplitters": "^0.1.0",
     "@nuxt/eslint": "^1.9.0",
+    "@nuxtjs/mdc": "^0.17.4",
+    "@types/node": "^24.5.2",
+    "@upstash/vector": "^1.2.2",
+    "ai": "^5.0.47",
+    "date-fns": "^4.1.0",
     "eslint": "^9.35.0",
+    "shiki-stream": "^0.1.2",
     "typescript": "^5.9.2",
     "vue-tsc": "^3.0.7"
   },
