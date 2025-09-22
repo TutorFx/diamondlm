@@ -14,17 +14,14 @@ useHead({
   ]
 })
 
-const title = 'Nuxt AI Chatbot template'
-const description = 'A full-featured, hackable Nuxt AI chatbot template made with Nuxt UI.'
+const title = 'DiamondLM'
+const description = 'Chatbot de AI com RAG.'
 
 useSeoMeta({
   title,
   description,
   ogTitle: title,
-  ogDescription: description,
-  ogImage: 'https://ui4.nuxt.com/assets/templates/nuxt/chat-light.png',
-  twitterImage: 'https://ui4.nuxt.com/assets/templates/nuxt/chat-light.png',
-  twitterCard: 'summary_large_image'
+  ogDescription: description
 })
 </script>
 
