@@ -1,60 +1,92 @@
-# Nuxt Starter Template
+# 💎 Diamond LLM
 
-[![Nuxt UI](https://img.shields.io/badge/Made%20with-Nuxt%20UI-00DC82?logo=nuxt&labelColor=020420)](https://ui.nuxt.com)
+A chat interface for Large Language Models, built with the power and simplicity of [Nuxt 4](https://nuxt.com/) and [Nuxt UI](https://ui.nuxt.com/).
 
-Use this template to get started with [Nuxt UI](https://ui.nuxt.com) quickly.
+---
 
-- [Live demo](https://starter-template.nuxt.dev/)
-- [Documentation](https://ui4.nuxt.com/docs/getting-started/installation/nuxt)
+## Overview
 
-<a href="https://starter-template.nuxt.dev/" target="_blank">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://ui4.nuxt.com/assets/templates/nuxt/starter-dark.png">
-    <source media="(prefers-color-scheme: light)" srcset="https://ui4.nuxt.com/assets/templates/nuxt/starter-light.png">
-    <img alt="Nuxt Starter Template" src="https://ui4.nuxt.com/assets/templates/nuxt/starter-light.png">
-  </picture>
-</a>
+Diamond LLM provides an elegant and high-performance platform for interacting with LLMs. The project uses the [Vercel AI SDK](https://sdk.vercel.ai/docs) for seamless integration with AI services, such as the Google Gemini API.
 
-> The starter template for Vue is on https://github.com/nuxt-ui-templates/starter-vue.
+To enrich conversation context, the project leverages [Upstash Vector](https://upstash.com/vector) as a vector database, enabling Retrieval-Augmented Generation (RAG).
 
-## Quick Start
+[DEMO](diamond-llm.vercel.app)
 
-```bash [Terminal]
-npm create nuxt@latest -- -t github:nuxt-ui-templates/starter
-```
+## ✨ Features
 
-## Deploy your own
+- **Reactive Interface**: Built with Vue.js and Nuxt UI for a modern user experience.
+- **Streaming Responses**: Receive real-time answers from the language model.
+- **RAG with Upstash**: Utilizes a vector database to provide additional context to the AI's responses.
+- **Syntax Highlighting**: Code blocks in responses are automatically highlighted.
+- **Integrated Backend**: The Nuxt API manages secure communication with AI services.
+- **Text Splitting**: Uses [LangChain](https://js.langchain.com/) for text processing and splitting.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-name=starter&repository-url=https%3A%2F%2Fgithub.com%2Fnuxt-ui-templates%2Fstarter&demo-image=https%3A%2F%2Fui4.nuxt.com%2Fassets%2Ftemplates%2Fnuxt%2Fstarter-dark.png&demo-url=https%3A%2F%2Fstarter-template.nuxt.dev%2F&demo-title=Nuxt%20Starter%20Template&demo-description=A%20minimal%20template%20to%20get%20started%20with%20Nuxt%20UI.)
+## 🚀 Getting Started
 
-## Setup
+Follow the steps below to set up and run the project in your local environment.
 
-Make sure to install the dependencies:
+### 1. Prerequisites
 
-```bash
-pnpm install
-```
+- [Node.js](https://nodejs.org/en/) (version 20.x or higher)
+- [Bun](https://bun.sh/)
 
-## Development Server
+### 2. Installation
 
-Start the development server on `http://localhost:3000`:
+Clone the repository and install the dependencies using `bun`:
 
 ```bash
-pnpm dev
+# Clone the project
+git clone https://github.com/TutorFx/diamondlm.git
+
+# Navigate to the directory
+cd diamond-llm
+
+# Install dependencies
+bun install
 ```
 
-## Production
+### 3. Environment Variables
 
-Build the application for production:
+Create a `.env` file in the project root. It is required to store API keys and other sensitive settings.
+
+```env
+# Google Gemini API Key
+GOOGLE_API_KEY="YOUR_KEY_HERE"
+
+# Upstash Vector Credentials
+UPSTASH_VECTOR_REST_URL="YOUR_URL_HERE"
+UPSTASH_VECTOR_REST_TOKEN="YOUR_TOKEN_HERE"
+```
+
+### 4. Running in Development
+
+Start the development server. The application will be available at `http://localhost:3000`.
 
 ```bash
-pnpm build
+bun run dev
 ```
 
-Locally preview production build:
+## ▶️ Available Commands
 
-```bash
-pnpm preview
+- `bun run dev`: Starts the development server with hot-reloading.
+- `bun run build`: Compiles the application for production.
+- `bun run preview`: Previews the production build locally.
+- `bun run lint`: Runs ESLint to find and fix issues in the code.
+- `bun run typecheck`: Performs a type check on the entire project with TypeScript.
+
+## 📁 Directory Structure
+
+The project follows the standard Nuxt 4 directory structure:
+
 ```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+/diamond-llm
+├── app/              # Contains all frontend logic
+│   ├── components/     # Reusable Vue components
+│   ├── layouts/        # Application layouts
+│   └── pages/          # Pages and routing system
+├── server/           # Backend logic
+│   └── api/            # API endpoints
+├── public/           # Static assets
+├── nuxt.config.ts    # Main Nuxt configuration file
+└── package.json      # Dependencies and scripts
+```
