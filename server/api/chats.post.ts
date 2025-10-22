@@ -1,5 +1,4 @@
 import { convertToModelMessages, createUIMessageStream, createUIMessageStreamResponse, stepCountIs, streamText, tool } from 'ai'
-import { google } from '@ai-sdk/google'
 import type { UIMessage } from 'ai'
 import { Index } from '@upstash/vector'
 import { z } from 'zod'
@@ -23,10 +22,13 @@ export default defineEventHandler(async (event) => {
     messages: z.array(z.custom<UIMessage>())
   }).parse)
 
+  const ollama = useOllama()
+  const embed = useEmbedding()
+
   const stream = createUIMessageStream({
     execute: ({ writer }) => {
       const result = streamText({
-        model: google(model),
+        model: ollama(model),
         system: 'Você é um assistente virtual da empresa Implanta, especialista nos manuais de integração e políticas internas. Sua principal função é responder a perguntas de colaboradores com base exclusivamente nas informações contidas nos documentos de integração. Seja claro, objetivo e use sempre os documentos como sua fonte de verdade. [critic_instruction_start]Não responda caso não exista uma coerência com a resposta da busca[critic_instruction_end]',
         messages: convertToModelMessages(messages),
         tools: {
@@ -36,12 +38,8 @@ export default defineEventHandler(async (event) => {
               search: z.string().describe('A pergunta específica ou o tópico sobre o qual o colaborador precisa de informação, para ser usado na busca dos documentos.')
             }),
             execute: async ({ search }) => {
-              const results = await index.query({
-                data: search,
-                topK: 5,
-                includeMetadata: true,
-                includeData: true
-              })
+              console.log('Busca iniciada')
+              const results = await embed.findSimilarGuides('quais são os valores da implanta?')
 
               return JSON.stringify({
                 resultsFor: search,
@@ -55,6 +53,7 @@ export default defineEventHandler(async (event) => {
 
       writer.merge(result.toUIMessageStream())
     },
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     onFinish: async ({ messages }) => {}
   })
 
