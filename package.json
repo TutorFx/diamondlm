@@ -8,13 +8,17 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "lint": "eslint .",
-    "typecheck": "nuxt typecheck"
+    "typecheck": "nuxt typecheck",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate"
   },
   "dependencies": {
     "@iconify-json/lucide": "^1.2.68",
     "@iconify-json/simple-icons": "^1.2.52",
     "@nuxt/ui": "^4.0.0-alpha.2",
-    "nuxt": "^4.1.0"
+    "drizzle-orm": "^0.44.6",
+    "nuxt": "^4.1.0",
+    "ollama-ai-provider-v2": "^1.5.0"
   },
   "devDependencies": {
     "@ai-sdk/gateway": "^1.0.24",
@@ -26,8 +30,11 @@
     "@types/node": "^24.5.2",
     "@upstash/vector": "^1.2.2",
     "ai": "^5.0.47",
+    "ai-sdk-ollama": "^0.13.0",
     "date-fns": "^4.1.0",
+    "drizzle-kit": "^0.31.5",
     "eslint": "^9.35.0",
+    "pg": "^8.16.3",
     "shiki-stream": "^0.1.2",
     "typescript": "^5.9.2",
     "vue-tsc": "^3.0.7"
