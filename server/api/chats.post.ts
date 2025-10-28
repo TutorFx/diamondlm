@@ -1,8 +1,6 @@
-import { convertToModelMessages, createUIMessageStream, createUIMessageStreamResponse, stepCountIs, streamText, tool } from 'ai'
+import { convertToModelMessages, createUIMessageStream, createUIMessageStreamResponse, stepCountIs, streamText, tool, smoothStream } from 'ai'
 import type { UIMessage } from 'ai'
-import { Index } from '@upstash/vector'
 import { z } from 'zod'
-import process from 'node:process'
 
 defineRouteMeta({
   openAPI: {
@@ -12,11 +10,6 @@ defineRouteMeta({
 })
 
 export default defineEventHandler(async (event) => {
-  const index = new Index({
-    url: process.env.UPSTASH_VECTOR_REST_URL,
-    token: process.env.UPSTASH_VECTOR_REST_TOKEN
-  })
-
   const { model, messages } = await readValidatedBody(event, z.object({
     model: z.string(),
     messages: z.array(z.custom<UIMessage>())
@@ -24,6 +17,17 @@ export default defineEventHandler(async (event) => {
 
   const ollama = useOllama()
   const embed = useEmbedding()
+
+  let sources: {
+    id: string
+    delta: string
+  }[] = []
+
+  const last = messages.at(-1)?.parts[0]
+
+  if (last?.type === 'text') {
+    last.text.endsWith('?')
+  }
 
   const stream = createUIMessageStream({
     execute: ({ writer }) => {
@@ -38,8 +42,16 @@ export default defineEventHandler(async (event) => {
               search: z.string().describe('A pergunta específica ou o tópico sobre o qual o colaborador precisa de informação, para ser usado na busca dos documentos.')
             }),
             execute: async ({ search }) => {
-              console.log('Busca iniciada')
-              const results = await embed.findSimilarGuides('quais são os valores da implanta?')
+              const results = await embed.findSimilarGuides(search)
+
+              console.log(results)
+
+              sources = sources.concat(results.map((result) => {
+                return {
+                  id: result.name,
+                  delta: result.description
+                }
+              }))
 
               return JSON.stringify({
                 resultsFor: search,
@@ -48,8 +60,24 @@ export default defineEventHandler(async (event) => {
             }
           })
         },
-        stopWhen: stepCountIs(5)
+        experimental_transform: smoothStream({ chunking: 'word' }),
+        stopWhen: [
+          stepCountIs(5)
+        ],
+        toolChoice: last?.type === 'text'
+          ? last.text.includes('?')
+            ? 'required'
+            : 'auto'
+          : 'auto'
       })
+
+      for (let i = 0; i < sources.length; i++) {
+        const element = sources[i]
+        writer.write({
+          type: 'text-delta',
+          ...element
+        })
+      }
 
       writer.merge(result.toUIMessageStream())
     },

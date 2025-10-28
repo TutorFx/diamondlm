@@ -62,7 +62,7 @@ export default defineTask({
     // console.log(mappedData[1])
     // console.log(mappedData[2])
 
-    await db.insert(tables.guides).values([mappedData[0]])
+    await db.insert(tables.guides).values(mappedData)
 
     return { result: 'Success' }
   }

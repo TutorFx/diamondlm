@@ -17,8 +17,8 @@ export function useEmbedding() {
     const similarity = sql<number>`1 - (${cosineDistance(guides.embedding, embedding)})`
     const similarGuides = await db
       .select({ name: guides.title, description: guides.description, similarity })
-      .from(tables.guides)
-      .where(gt(similarity, 0.5))
+      .from(guides)
+      // .where(gt(similarity, 0.5))
       .orderBy(t => desc(t.similarity))
       .limit(4)
     return similarGuides
