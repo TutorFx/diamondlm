@@ -1,12 +1,9 @@
 export function useModels() {
   const models = [
-    'mistral:latest',
-    'gpt-oss:20b',
-    'qwen2.5:7b',
-    'qwen2.5:3b'
+    'qwen2.5:7b'
   ]
 
-  const model = useCookie<string>('model', { default: () => 'gemini-2.5-flash-lite' })
+  const model = useCookie<string>('model', { default: () => 'qwen2.5:7b' })
 
   return {
     models,
