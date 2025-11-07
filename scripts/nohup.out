@@ -1,0 +1,10 @@
+Listening on http://[::]:3000
+[uncaughtException] error: Failed to start server. Is port 3000 in use?
+ syscall: "listen",
+   errno: 0,
+    code: "EADDRINUSE"
+
+      at serve (unknown:1:1)
+      at node:_http_server:272:39
+      at node:_http_server:249:33
+

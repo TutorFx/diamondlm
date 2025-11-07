@@ -4,6 +4,9 @@
   "type": "module",
   "scripts": {
     "build": "nuxt build",
+    "build:prod": "bun --env-file=.env.prod run build",
+    "deploy:prod": "sh ./scripts/deploy",
+    "deploy:serve:stop": "sh ./scripts/stop.sh",
     "dev": "nuxt dev",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",

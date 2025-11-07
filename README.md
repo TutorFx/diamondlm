@@ -60,7 +60,7 @@ UPSTASH_VECTOR_REST_TOKEN="YOUR_TOKEN_HERE"
 
 ### 4. Running in Development
 
-Start the development server. The application will be available at `http://localhost:3000`.
+Start the development server. The application will be available at `http://127.0.0.1:3000`.
 
 ```bash
 bun run dev
