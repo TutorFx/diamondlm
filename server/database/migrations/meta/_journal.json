@@ -15,6 +15,13 @@
       "when": 1761146637921,
       "tag": "0001_fine_caretaker",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1762790000031,
+      "tag": "0002_flimsy_ben_parker",
+      "breakpoints": true
     }
   ]
 }
