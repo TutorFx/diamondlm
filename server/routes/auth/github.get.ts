@@ -12,7 +12,6 @@ export default defineOAuthGitHubEventHandler({
         name: ghUser.name || '',
         email: ghUser.email || '',
         avatar: ghUser.avatar_url || '',
-        username: ghUser.login,
         provider: 'github',
         providerId: ghUser.id.toString()
       }).returning()
@@ -23,7 +22,7 @@ export default defineOAuthGitHubEventHandler({
       }).where(eq(tables.chats.userId, session.id))
     }
 
-    await setUserSession(event, { user })
+    await setUserSession(event, { user, loggedInAt: new Date() })
 
     return sendRedirect(event, '/')
   },

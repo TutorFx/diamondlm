@@ -19,17 +19,17 @@ export const guides = pgTable(
   ]
 )
 
-export const providerEnum = pgEnum('provider', ['github'])
+export const providerEnum = pgEnum('provider', ['github', 'token'])
 export const roleEnum = pgEnum('role', ['user', 'assistant'])
 
 export const users = pgTable('users', {
   id: varchar({ length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
-  email: varchar({ length: 255 }).notNull(),
+  email: varchar({ length: 255 }).unique().notNull(),
   name: varchar({ length: 100 }).notNull(),
-  avatar: varchar({ length: 500 }).notNull(),
-  username: varchar({ length: 50 }).notNull(),
+  password: varchar({ length: 255 }),
+  avatar: varchar({ length: 500 }),
   provider: providerEnum().notNull(),
-  providerId: varchar({ length: 50 }).notNull(),
+  providerId: varchar({ length: 50 }),
   ...timestamps
 }, table => [
   uniqueIndex('users_provider_id_idx').on(table.provider, table.providerId)

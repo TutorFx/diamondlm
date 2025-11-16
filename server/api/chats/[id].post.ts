@@ -88,11 +88,7 @@ export default defineEventHandler(async (event) => {
         tools: {
           search: searchTool()
         },
-        toolChoice: lastMessage?.parts[0].type === 'text'
-          ? lastMessage?.parts[0].text.includes('?')
-            ? 'required'
-            : 'auto'
-          : 'auto'
+        toolChoice: 'required'
       })
 
       if (!chat.title) {

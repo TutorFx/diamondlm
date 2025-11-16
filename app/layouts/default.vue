@@ -146,15 +146,25 @@ defineShortcuts({
 
       <template #footer="{ collapsed }">
         <UserMenu v-if="loggedIn" :collapsed="collapsed" />
-        <UButton
-          v-else
-          :label="collapsed ? '' : 'Login with GitHub'"
-          icon="i-simple-icons-github"
-          color="neutral"
-          variant="ghost"
-          class="w-full"
-          @click="openInPopup('/auth/github')"
-        />
+        <div v-else class="grid gap-4 w-full">
+          <UButton
+            :label="collapsed ? '' : 'Login with GitHub'"
+            icon="i-simple-icons-github"
+            color="neutral"
+            variant="ghost"
+            class="w-full"
+            @click="openInPopup('/auth/github')"
+          />
+          <ModalAuth>
+            <UButton
+              :label="collapsed ? '' : 'Entrar'"
+              icon="mdi:login"
+              color="neutral"
+              variant="ghost"
+              class="w-full"
+            />
+          </ModalAuth>
+        </div>
       </template>
     </UDashboardSidebar>
 

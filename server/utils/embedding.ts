@@ -1,4 +1,4 @@
-import { cosineDistance, gt } from 'drizzle-orm'
+import { cosineDistance } from 'drizzle-orm'
 import { guides } from '../database/schema'
 import { embed } from 'ai'
 
