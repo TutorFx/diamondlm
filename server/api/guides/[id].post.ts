@@ -60,6 +60,8 @@ export default defineEventHandler(async (event) => {
     .map((_, index) => index)
     .filter(index => !Array.from(pointers.values()).includes(index))
 
+  const queue = useEmbeddingQueue()
+
   const updatedGuide = await db.transaction(async (tx) => {
     if (chunksToDelete.length > 0) {
       await tx.delete(tables.chunk).where(inArray(tables.chunk.id, chunksToDelete))
@@ -73,8 +75,6 @@ export default defineEventHandler(async (event) => {
           embedding: null
         }
       })).returning({ id: tables.chunk.id })
-
-      const queue = useEmbeddingQueue()
 
       const jobs = insertedChunks.map(chunk => ({
         name: 'generate',
