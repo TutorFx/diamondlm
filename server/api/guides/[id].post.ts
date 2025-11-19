@@ -1,5 +1,6 @@
 import { z } from 'zod/v4'
 import { inArray } from 'drizzle-orm'
+import { useEmbeddingQueue } from '../../utils/queue'
 
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
@@ -65,13 +66,28 @@ export default defineEventHandler(async (event) => {
     }
 
     if (chunksThatNoExist.length > 0) {
-      await tx.insert(tables.chunk).values(chunksThatNoExist.map((newChunkIndex) => {
+      const insertedChunks = await tx.insert(tables.chunk).values(chunksThatNoExist.map((newChunkIndex) => {
         return {
           guideId: Number(id),
           content: newChunks[newChunkIndex].pageContent,
           embedding: null
         }
+      })).returning({ id: tables.chunk.id })
+
+      const queue = useEmbeddingQueue()
+
+      const jobs = insertedChunks.map(chunk => ({
+        name: 'generate',
+        data: { chunkId: chunk.id },
+        opts: {
+          removeOnComplete: true,
+          attempts: 3,
+          backoff: { type: 'exponential', delay: 1000 }
+        }
       }))
+
+      await queue.addBulk(jobs)
+      console.log(`[API] ${jobs.length} chunks enviados para a fila de processamento.`)
     }
 
     const [updated] = await tx.update(tables.guides).set({
