@@ -14,17 +14,15 @@ export default defineEventHandler(async (event) => {
 
   if (!user) {
     throw createError({ statusCode: 400 })
-  } else {
-    await db.update(tables.chats).set({
-      userId: user.id
-    }).where(eq(tables.chats.userId, session.id))
   }
-
-  console.log(user.password)
 
   if (!await VerifyPassword(body.data.password, user.password!)) {
     throw createError({ statusCode: 400 })
   }
+
+  await db.update(tables.chats).set({
+    userId: user.id
+  }).where(eq(tables.chats.userId, session.id))
 
   await setUserSession(event, {
     user,

@@ -81,6 +81,31 @@ defineShortcuts({
     navigateTo('/')
   }
 })
+
+onMounted(async () => {
+  const cookie = useCookie('cookie-consent')
+  if (cookie.value === 'accepted') {
+    return
+  }
+
+  toast.add({
+    title: 'Utilizamos cookies próprios para aprimorar a sua experiência no nosso site.',
+    duration: 0,
+    close: false,
+    actions: [{
+      label: 'Aceitar',
+      color: 'neutral',
+      variant: 'outline',
+      onClick: () => {
+        cookie.value = 'accepted'
+      }
+    }, {
+      label: 'Negar',
+      color: 'neutral',
+      variant: 'ghost'
+    }]
+  })
+})
 </script>
 
 <template>

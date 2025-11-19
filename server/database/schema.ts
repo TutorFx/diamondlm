@@ -1,23 +1,47 @@
 import { relations } from 'drizzle-orm'
-import { index, json, pgEnum, pgTable, serial, text, timestamp, uniqueIndex, varchar, vector } from 'drizzle-orm/pg-core'
+import { index, integer, json, pgEnum, pgTable, serial, text, timestamp, uniqueIndex, varchar, vector } from 'drizzle-orm/pg-core'
 
 const timestamps = {
-  createdAt: timestamp().defaultNow().notNull()
+  createdAt: timestamp().defaultNow().notNull(),
+  updatedAt: timestamp({ mode: 'date' })
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date())
 }
 
-export const guides = pgTable(
-  'guides',
+export const guides = pgTable('guides', {
+  id: serial('id').primaryKey(),
+  title: text('title').notNull(),
+  content: text('description').notNull(),
+  ...timestamps
+})
+
+export const documentsRelations = relations(guides, ({ many }) => ({
+  guides: many(chunk)
+}))
+
+export const chunk = pgTable(
+  'chunk',
   {
     id: serial('id').primaryKey(),
-    title: text('title').notNull(),
-    description: text('description').notNull(),
+    guideId: integer('guide_id')
+      .notNull()
+      .references(() => guides.id, { onDelete: 'cascade' }),
     embedding: vector('embedding', { dimensions: 1024 }),
+    content: text('content').notNull(),
     ...timestamps
   },
   table => [
     index('embeddingIndex').using('hnsw', table.embedding.op('vector_cosine_ops'))
   ]
 )
+
+export const chunkRelations = relations(chunk, ({ one }) => ({
+  guide: one(guides, {
+    fields: [chunk.guideId],
+    references: [guides.id]
+  })
+}))
 
 export const providerEnum = pgEnum('provider', ['github', 'token'])
 export const roleEnum = pgEnum('role', ['user', 'assistant'])

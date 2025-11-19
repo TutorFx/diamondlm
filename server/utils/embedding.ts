@@ -1,5 +1,6 @@
 import { cosineDistance } from 'drizzle-orm'
-import { guides } from '../database/schema'
+import { chunk, guides } from '../database/schema'
+import { encode } from '@toon-format/toon'
 import { embed } from 'ai'
 
 export function useEmbedding() {
@@ -13,15 +14,25 @@ export function useEmbedding() {
   }
 
   const findSimilarGuides = async (description: string) => {
+    console.log('Gerando embedding para a descrição fornecida...')
     const embedding = await generateEmbedding(description)
-    const similarity = sql<number>`1 - (${cosineDistance(guides.embedding, embedding)})`
+    const similarity = sql<number>`1 - (${cosineDistance(chunk.embedding, embedding)})`
     const similarGuides = await db
-      .select({ name: guides.title, description: guides.description, similarity })
-      .from(guides)
+      .select({
+        similarity,
+        guide: {
+          title: guides.title
+        },
+        chunk: {
+          content: chunk.content
+        }
+      })
+      .from(chunk)
+      .innerJoin(guides, eq(chunk.guideId, guides.id))
       // .where(gt(similarity, 0.5))
       .orderBy(t => desc(t.similarity))
       .limit(4)
-    return similarGuides
+    return encode(similarGuides)
   }
 
   return { findSimilarGuides, generateEmbedding }

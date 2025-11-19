@@ -4,7 +4,8 @@ export default defineNuxtConfig({
     '@nuxt/eslint',
     '@nuxt/ui',
     '@nuxtjs/mdc',
-    'nuxt-auth-utils'
+    'nuxt-auth-utils',
+    'nuxt-monaco-editor'
   ],
 
   devtools: {
