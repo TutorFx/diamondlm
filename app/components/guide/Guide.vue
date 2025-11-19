@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { DropdownMenuItem } from '@nuxt/ui'
+import { LazyModalConfirm } from '#components'
 import { format } from 'date-fns'
 
 const props = defineProps<{
@@ -7,21 +9,35 @@ const props = defineProps<{
 
 const emits = defineEmits(['close'])
 
-const dropdownItems = [[{
-  label: 'Mark as unread',
-  icon: 'i-lucide-check-circle'
-}, {
-  label: 'Mark as important',
-  icon: 'i-lucide-triangle-alert'
-}], [{
-  label: 'Star thread',
-  icon: 'i-lucide-star'
-}, {
-  label: 'Mute thread',
-  icon: 'i-lucide-circle-pause'
+const dropdownItems: DropdownMenuItem[][] = [[{
+  label: 'Deletar guia',
+  icon: 'i-lucide-trash',
+  color: 'error',
+  onSelect: async () => {
+    const instance = deleteModal.open()
+    const result = await instance.result
+    if (!result) {
+      return
+    }
+
+    await $fetch(`/api/guides/${guideId.value}`, { method: 'DELETE' })
+
+    toast.add({
+      title: 'Guia deletado',
+      description: 'Seu guia foi deletado',
+      icon: 'i-lucide-trash'
+    })
+  }
 }]]
 
 const toast = useToast()
+const overlay = useOverlay()
+const deleteModal = overlay.create(LazyModalConfirm, {
+  props: {
+    title: 'Deletar guia',
+    description: 'Você tem certeza que quer deletar o guia? Essa ação não pode ser desfeita.'
+  }
+})
 
 const update = ref('')
 const colorMode = useColorMode()
@@ -91,11 +107,6 @@ function updateGuide() {
             @click="updateGuide"
           />
         </UTooltip>
-
-        <UTooltip text="Reply">
-          <UButton icon="i-lucide-reply" color="neutral" variant="ghost" />
-        </UTooltip>
-
         <UDropdownMenu :items="dropdownItems">
           <UButton
             icon="i-lucide-ellipsis-vertical"
