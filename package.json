@@ -44,6 +44,7 @@
     "ai": "^5.0.93",
     "ai-sdk-ollama": "^0.13.0",
     "argon2": "^0.44.0",
+    "bullmq": "^5.63.2",
     "date-fns": "^4.1.0",
     "drizzle-kit": "^0.31.7",
     "drizzle-zod": "^0.8.3",

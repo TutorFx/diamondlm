@@ -1,7 +1,8 @@
 import { cosineDistance } from 'drizzle-orm'
 import { chunk, guides } from '../database/schema'
 import { encode } from '@toon-format/toon'
-import { embed } from 'ai'
+import { embed, embedMany } from 'ai'
+import { useOllama } from './ollama'
 
 export function useEmbedding() {
   const ollama = useOllama()
@@ -11,6 +12,17 @@ export function useEmbedding() {
     const model = ollama.textEmbeddingModel('bge-m3')
     const result = await embed({ value: description, model })
     return result.embedding
+  }
+
+  const generateManyEmbeddings = async (values: string[]) => {
+    const model = ollama.textEmbeddingModel('bge-m3')
+
+    const { embeddings } = await embedMany({
+      model: model,
+      values: values
+    })
+
+    return embeddings
   }
 
   const findSimilarGuides = async (description: string) => {
@@ -35,5 +47,5 @@ export function useEmbedding() {
     return encode(similarGuides)
   }
 
-  return { findSimilarGuides, generateEmbedding }
+  return { findSimilarGuides, generateEmbedding, generateManyEmbeddings }
 }

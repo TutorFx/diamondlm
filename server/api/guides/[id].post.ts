@@ -1,7 +1,15 @@
 import { z } from 'zod/v4'
+import { inArray } from 'drizzle-orm'
 
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
+
+  if (!session.user) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: 'Not authenticated'
+    })
+  }
 
   const { id } = await getValidatedRouterParams(event, z.object({
     id: z.string()
@@ -13,19 +21,67 @@ export default defineEventHandler(async (event) => {
 
   const db = useDrizzle()
 
-  const [guide] = await db.select().from(tables.guides).where(
+  const [guide] = await db.select({
+    title: tables.guides.title
+  }).from(tables.guides).where(
     eq(tables.guides.id, Number(id))
   ).limit(1)
 
-  const chunks = splitText({ title: guide.title, content: content })
+  if (!guide) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: 'Guide not found'
+    })
+  }
 
-  const updatedGuide = await db.update(tables.guides).set({
-    content
-  }).where(
-    and(
+  const newChunks = await splitText({ title: guide.title, content })
+  const oldChunks = await db.query.chunk.findMany({
+    where: eq(tables.chunk.guideId, Number(id))
+  })
+
+  const pointers = new Map<number, number>()
+
+  for (let ocIndex = 0; ocIndex < oldChunks.length; ocIndex++) {
+    const oldChunk = oldChunks[ocIndex]
+    for (let ncIndex = 0; ncIndex < newChunks.length; ncIndex++) {
+      const newChunk = newChunks[ncIndex]
+
+      if (oldChunk.content === newChunk.pageContent) {
+        pointers.set(ocIndex, ncIndex)
+      }
+    }
+  }
+
+  const chunksToDelete: number[] = oldChunks
+    .filter((_, index) => !pointers.has(index)).map(c => c.id)
+
+  const chunksThatNoExist: number[] = newChunks
+    .map((_, index) => index)
+    .filter(index => !Array.from(pointers.values()).includes(index))
+
+  const updatedGuide = await db.transaction(async (tx) => {
+    if (chunksToDelete.length > 0) {
+      await tx.delete(tables.chunk).where(inArray(tables.chunk.id, chunksToDelete))
+    }
+
+    if (chunksThatNoExist.length > 0) {
+      await tx.insert(tables.chunk).values(chunksThatNoExist.map((newChunkIndex) => {
+        return {
+          guideId: Number(id),
+          content: newChunks[newChunkIndex].pageContent,
+          embedding: null
+        }
+      }))
+    }
+
+    const [updated] = await tx.update(tables.guides).set({
+      content
+    }).where(
       eq(tables.guides.id, Number(id))
-    )
-  ).returning()
+    ).returning()
+
+    return updated
+  })
 
   return updatedGuide
 })
