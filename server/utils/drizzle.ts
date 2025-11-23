@@ -23,7 +23,13 @@ export function useDrizzle() {
 }
 
 export type Guide = typeof tables.guides.$inferSelect
+export type NewGuide = typeof tables.guides.$inferInsert
 export type Chunk = typeof tables.chunk.$inferSelect
+export type NewChunk = typeof tables.chunk.$inferInsert
 export type User = typeof tables.users.$inferSelect
-export type UserInsert = typeof tables.users.$inferInsert
+export type NewUser = typeof tables.users.$inferInsert
 export type AuthProvider = typeof tables.providerEnum.enumValues[number]
+export type Group = typeof tables.groups.$inferSelect
+export type NewGroup = typeof tables.groups.$inferInsert
+export type GroupMember = typeof tables.groupMembers.$inferSelect
+export type NewGroupMember = typeof tables.groupMembers.$inferInsert

@@ -5,7 +5,7 @@ const route = useRoute()
 
 const open = ref(false)
 
-const links = [[{
+const links = computed(() => [[{
   label: 'Home',
   icon: 'i-lucide-house',
   to: '/',
@@ -15,11 +15,17 @@ const links = [[{
 }, {
   label: 'Guias',
   icon: 'i-lucide-inbox',
-  to: '/dashboard/guide',
+  to: {
+    name: 'dashboard-groupSlug-guide',
+    params: { groupSlug: route.params.groupSlug }
+  },
   children: [{
     label: 'Novo Guia',
     icon: 'i-lucide-plus',
-    to: '/dashboard/guide/add',
+    to: {
+      name: 'dashboard-groupSlug-guide-add',
+      params: { groupSlug: route.params.groupSlug }
+    },
     onSelect: () => {
       open.value = false
     }
@@ -34,12 +40,12 @@ const links = [[{
   icon: 'i-lucide-info',
   to: 'https://github.com/nuxt-ui-templates/dashboard',
   target: '_blank'
-}]] satisfies NavigationMenuItem[][]
+}]] satisfies NavigationMenuItem[][])
 
 const groups = computed(() => [{
   id: 'links',
   label: 'Go to',
-  items: links.flat()
+  items: links.value.flat()
 }, {
   id: 'code',
   label: 'Code',
@@ -64,7 +70,7 @@ const groups = computed(() => [{
       :ui="{ footer: 'lg:border-t lg:border-default' }"
     >
       <template #header="{ collapsed }">
-        <TeamsMenu :collapsed="collapsed" />
+        <GroupsMenu :collapsed="collapsed" />
       </template>
 
       <template #default="{ collapsed }">

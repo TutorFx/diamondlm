@@ -1,5 +1,5 @@
 import { relations } from 'drizzle-orm'
-import { index, integer, json, pgEnum, pgTable, serial, text, timestamp, uniqueIndex, varchar, vector } from 'drizzle-orm/pg-core'
+import { index, integer, json, jsonb, pgEnum, pgTable, primaryKey, serial, text, timestamp, uniqueIndex, varchar, vector } from 'drizzle-orm/pg-core'
 
 const timestamps = {
   createdAt: timestamp().defaultNow().notNull(),
@@ -13,11 +13,17 @@ export const guides = pgTable('guides', {
   id: serial('id').primaryKey(),
   title: text('title').notNull(),
   content: text('description').notNull(),
+  groupId: varchar('group_id', { length: 36 }).references(() => groups.id, { onDelete: 'cascade' }),
   ...timestamps
 })
 
-export const documentsRelations = relations(guides, ({ many }) => ({
-  guides: many(chunk)
+export const guidesRelations = relations(guides, ({ many, one }) => ({
+  guides: many(chunk),
+
+  group: one(groups, {
+    fields: [guides.groupId],
+    references: [groups.id]
+  })
 }))
 
 export const chunk = pgTable(
@@ -60,7 +66,8 @@ export const users = pgTable('users', {
 ])
 
 export const usersRelations = relations(users, ({ many }) => ({
-  chats: many(chats)
+  chats: many(chats),
+  groupMemberships: many(groupMembers)
 }))
 
 export const chats = pgTable('chats', {
@@ -95,4 +102,33 @@ export const messagesRelations = relations(messages, ({ one }) => ({
     fields: [messages.chatId],
     references: [chats.id]
   })
+}))
+
+export const groups = pgTable('groups', {
+  id: varchar({ length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
+  name: varchar({ length: 255 }).notNull(),
+  slug: varchar({ length: 255 }).unique().notNull(), // Ex: 'rocketseat', 'meu-time'
+  ...timestamps
+})
+
+export const groupMembers = pgTable('group_members', {
+  id: serial('id'),
+  userId: varchar({ length: 36 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  groupId: varchar({ length: 36 }).notNull().references(() => groups.id, { onDelete: 'cascade' }),
+
+  // Ex no banco: ["guide:create", "guide:delete"]
+  permissions: jsonb('permissions').$type<GroupMemberPermission[]>().notNull().default([]),
+
+  ...timestamps
+}, t => [primaryKey({ columns: [t.userId, t.groupId] }), index('group_members_user_id_idx').on(t.userId)])
+
+export const groupsRelations = relations(groups, ({ many }) => ({
+  members: many(groupMembers),
+  guides: many(guides)
+}))
+
+// Relations da ACL (Membros)
+export const groupMembersRelations = relations(groupMembers, ({ one }) => ({
+  user: one(users, { fields: [groupMembers.userId], references: [users.id] }),
+  group: one(groups, { fields: [groupMembers.groupId], references: [groups.id] })
 }))
