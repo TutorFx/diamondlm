@@ -34,7 +34,6 @@
     "@nuxtjs/mdc": "^0.17.4",
     "@toon-format/toon": "^1.0.0",
     "@types/node": "^24.10.1",
-    "@upstash/vector": "^1.2.2",
     "@vueuse/router": "^14.0.0",
     "ai": "^5.0.93",
     "ai-sdk-ollama": "^0.13.0",

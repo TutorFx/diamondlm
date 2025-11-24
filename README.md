@@ -13,7 +13,7 @@ Diamond LLM is a modern, high-performance chat interface for Large Language Mode
 - **Chat History**: Persistent chat history stored in PostgreSQL.
 
 ### 📚 RAG (Retrieval-Augmented Generation)
-- **Vector Database**: Utilizes **Upstash Vector** for storing and retrieving embeddings.
+- **Vector Database**: Utilizes **Postgres Vector** for storing and retrieving embeddings.
 - **Contextual Awareness**: Enhances LLM responses by retrieving relevant information from your knowledge base (Guides).
 - **Text Splitting**: Intelligent text chunking using **LangChain** for optimal embedding generation.
 
@@ -32,7 +32,7 @@ Diamond LLM is a modern, high-performance chat interface for Large Language Mode
 - **Framework**: [Nuxt 4](https://nuxt.com/) (Vue.js)
 - **UI Library**: [Nuxt UI](https://ui.nuxt.com/) (TailwindCSS)
 - **Database**: PostgreSQL with [Drizzle ORM](https://orm.drizzle.team/)
-- **Vector DB**: [Upstash Vector](https://upstash.com/vector)
+- **Vector DB**: [Postgres Vector](https://github.com/pgvector/pgvector)
 - **Queues**: [BullMQ](https://bullmq.io/) with Redis
 - **Auth**: [Nuxt Auth Utils](https://github.com/atinux/nuxt-auth-utils)
 - **Runtime**: [Bun](https://bun.sh/)
@@ -46,7 +46,7 @@ Diamond LLM is a modern, high-performance chat interface for Large Language Mode
 - **Bun** (latest)
 - **PostgreSQL** database
 - **Redis** instance (for BullMQ)
-- **Upstash Vector** database
+- **PostgreSQL** database with **pgvector** extension
 
 ### 2. Installation
 
