@@ -66,21 +66,16 @@ bun install
 Create a `.env` file in the root directory:
 
 ```env
-# Database
-DATABASE_URL="postgresql://user:password@localhost:5432/diamond_llm"
+POSTGRES_USER="testuser"
+POSTGRES_PASSWORD="testpass"
+POSTGRES_DB="dbname"
+POSTGRES_PORT=9293
+POSTGRES_HOSTNAME="127.0.0.1"
 
-# Authentication
-NUXT_SESSION_PASSWORD="complex_password_at_least_32_characters"
 
-# AI Providers
-GOOGLE_API_KEY="your_google_api_key"
+OLLAMA_BASE_URL="http://127.0.0.1:11434/api"
 
-# Upstash Vector
-UPSTASH_VECTOR_REST_URL="your_upstash_url"
-UPSTASH_VECTOR_REST_TOKEN="your_upstash_token"
-
-# Redis (for Queues)
-REDIS_HOST="localhost"
+REDIS_PASSWORD=sua_senha_secreta_redis
 REDIS_PORT=6379
 ```
 
