@@ -23,7 +23,7 @@ Diamond LLM is a modern, high-performance chat interface for Large Language Mode
 - **Public & Private Guides**: Support for both public guides and private group-specific knowledge bases.
 
 ### 📝 Content Management
-- **Rich Text Editor**: **Tiptap** integration for creating and editing guides.
+- **Code Editor**: **Monaco Editor** integration for creating and editing guides.
 - **Markdown Support**: Full markdown support for guide content.
 - **Guide Management**: Create, edit, and delete guides.
 - **Background Processing**: **BullMQ** handles heavy tasks like embedding generation asynchronously.
