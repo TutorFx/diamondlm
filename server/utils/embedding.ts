@@ -1,6 +1,6 @@
-import { cosineDistance } from 'drizzle-orm'
-import { chunk, guides } from '../database/schema'
-import { encode } from '@toon-format/toon'
+import { cosineDistance, and, eq, sql, desc, or, isNull, gt } from 'drizzle-orm'
+import { chunk, guides, groupMembers } from '../database/schema'
+import { PERMISSIONS } from '../../shared/utils/permissions'
 import { embed, embedMany } from 'ai'
 import { useOllama } from './ollama'
 
@@ -25,9 +25,9 @@ export function useEmbedding() {
     return embeddings
   }
 
-  const findSimilarGuides = async (description: string) => {
+  const findSimilarGuides = async (search: string, userId: string | null) => {
     console.log('Gerando embedding para a descrição fornecida...')
-    const embedding = await generateEmbedding(description)
+    const embedding = await generateEmbedding(search)
     const similarity = sql<number>`1 - (${cosineDistance(chunk.embedding, embedding)})`
     const similarGuides = await db
       .select({
@@ -41,10 +41,20 @@ export function useEmbedding() {
       })
       .from(chunk)
       .innerJoin(guides, eq(chunk.guideId, guides.id))
-      // .where(gt(similarity, 0.5))
+      .leftJoin(groupMembers, and(
+        eq(groupMembers.groupId, guides.groupId),
+        userId ? eq(groupMembers.userId, userId) : sql`FALSE`
+      ))
+      .where(and(
+        gt(similarity, 0.3),
+        or(
+          isNull(guides.groupId),
+          sql`${groupMembers.permissions} @> jsonb_build_array(${PERMISSIONS.GUIDE.READ}::text)`
+        )
+      ))
       .orderBy(t => desc(t.similarity))
       .limit(4)
-    return encode(similarGuides)
+    return similarGuides
   }
 
   return { findSimilarGuides, generateEmbedding, generateManyEmbeddings }

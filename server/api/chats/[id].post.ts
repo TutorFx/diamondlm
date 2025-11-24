@@ -86,7 +86,9 @@ export default defineEventHandler(async (event) => {
         stopWhen: stepCountIs(5),
         experimental_transform: smoothStream({ chunking: 'word' }),
         tools: {
-          search: searchTool()
+          search: searchTool({
+            userId: session.user?.id || session.id
+          })
         },
         toolChoice: 'required'
       })
