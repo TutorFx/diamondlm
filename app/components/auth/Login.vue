@@ -41,5 +41,5 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
     :separator="{
       icon: 'i-lucide-user'
     }"
-  ></UAuthForm>
+  />
 </template>

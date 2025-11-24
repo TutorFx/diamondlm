@@ -40,7 +40,13 @@ const isMobile = breakpoints.smaller('lg')
 
 <template>
   <!-- eslint-disable vue/no-multiple-template-root -->
-  <UDashboardPanel id="guide-1" :default-size="25" :min-size="20" :max-size="30" resizable>
+  <UDashboardPanel
+    id="guide-1"
+    :default-size="25"
+    :min-size="20"
+    :max-size="30"
+    resizable
+  >
     <UDashboardNavbar title="Guias">
       <template #leading>
         <UDashboardSidebarCollapse />
@@ -50,7 +56,12 @@ const isMobile = breakpoints.smaller('lg')
       </template>
 
       <template #right>
-        <UTabs v-model="selectedTab" :items="tabItems" :content="false" size="xs" />
+        <UTabs
+          v-model="selectedTab"
+          :items="tabItems"
+          :content="false"
+          size="xs"
+        />
       </template>
     </UDashboardNavbar>
     <GuideList v-model="selectedGuide" :guides="guides" />

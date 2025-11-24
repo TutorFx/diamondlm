@@ -10,10 +10,12 @@ const { groups, group } = useGroup()
 const route = useRoute()
 
 const selectedGroup = computed(() => {
-  const sgroup = route.params.groupSlug === 'public' ? {
-    name: 'Public',
-    slug: 'public'
-  } : group.value!
+  const sgroup = route.params.groupSlug === 'public'
+    ? {
+        name: 'Public',
+        slug: 'public'
+      }
+    : group.value!
 
   if (!sgroup) return createError({
     statusCode: 404,
@@ -63,15 +65,27 @@ const items = computed<DropdownMenuItem[][]>(() => {
 </script>
 
 <template>
-  <UDropdownMenu :items="items" :content="{ align: 'center', collisionPadding: 12 }" :loading="!groups"
-    :ui="{ content: collapsed ? 'w-40' : 'w-(--reka-dropdown-menu-trigger-width)' }">
-    <UButton v-bind="{
-      ...selectedGroup,
-      label: collapsed ? undefined : selectedGroup?.name,
-      trailingIcon: collapsed ? undefined : 'i-lucide-chevrons-up-down'
-    }" color="neutral" variant="ghost" block :square="collapsed" class="data-[state=open]:bg-elevated"
-      :class="[!collapsed && 'py-2']" :ui="{
+  <UDropdownMenu
+    :items="items"
+    :content="{ align: 'center', collisionPadding: 12 }"
+    :loading="!groups"
+    :ui="{ content: collapsed ? 'w-40' : 'w-(--reka-dropdown-menu-trigger-width)' }"
+  >
+    <UButton
+      v-bind="{
+        ...selectedGroup,
+        label: collapsed ? undefined : selectedGroup?.name,
+        trailingIcon: collapsed ? undefined : 'i-lucide-chevrons-up-down'
+      }"
+      color="neutral"
+      variant="ghost"
+      block
+      :square="collapsed"
+      class="data-[state=open]:bg-elevated"
+      :class="[!collapsed && 'py-2']"
+      :ui="{
         trailingIcon: 'text-dimmed'
-      }" />
+      }"
+    />
   </UDropdownMenu>
 </template>

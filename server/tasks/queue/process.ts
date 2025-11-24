@@ -3,7 +3,7 @@ export default defineTask({
     name: 'queue:process',
     description: 'Processa jobs pendentes da fila KV'
   },
-  async run({ payload, context }) {
+  async run(/* { payload, context } */) {
     return { }
   }
 })

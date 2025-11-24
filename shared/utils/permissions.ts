@@ -5,13 +5,13 @@ export const PERMISSIONS = {
     READ: 'group:read',
     UPDATE: 'group:update',
     DELETE: 'group:delete',
-    MANAGE_MEMBERS: 'group:members:manage',
+    MANAGE_MEMBERS: 'group:members:manage'
   },
   GUIDE: {
     READ: 'group:guide:read',
     CREATE: 'group:guide:create',
     UPDATE: 'group:guide:update',
-    DELETE: 'group:guide:delete',
+    DELETE: 'group:guide:delete'
   }
 } as const
 

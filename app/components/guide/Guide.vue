@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { DropdownMenuItem } from '@nuxt/ui'
 import { LazyModalConfirm } from '#components'
-import { format } from 'date-fns'
 
 const props = defineProps<{
   guideId: number
