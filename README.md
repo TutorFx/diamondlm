@@ -1,41 +1,57 @@
 # 💎 Diamond LLM
 
-A chat interface for Large Language Models, built with the power and simplicity of [Nuxt 4](https://nuxt.com/) and [Nuxt UI](https://ui.nuxt.com/).
+Diamond LLM is a modern, high-performance chat interface for Large Language Models (LLMs), built with **Nuxt 4** and **Nuxt UI**. It features a robust Retrieval-Augmented Generation (RAG) system, group-based access control, and a seamless user experience.
 
 ---
 
-## Overview
+## ✨ Key Features
 
-Diamond LLM provides an elegant and high-performance platform for interacting with LLMs. The project uses the [Vercel AI SDK](https://sdk.vercel.ai/docs) for seamless integration with AI services, such as the Google Gemini API.
+### 🤖 AI & Chat
+- **Multi-Model Support**: Integrated with **Google Gemini** and **Ollama** for local model inference.
+- **Streaming Responses**: Real-time token streaming for a responsive chat experience.
+- **Syntax Highlighting**: Automatic code block highlighting using **Shiki**.
+- **Chat History**: Persistent chat history stored in PostgreSQL.
 
-To enrich conversation context, the project leverages [Upstash Vector](https://upstash.com/vector) as a vector database, enabling Retrieval-Augmented Generation (RAG).
+### 📚 RAG (Retrieval-Augmented Generation)
+- **Vector Database**: Utilizes **Upstash Vector** for storing and retrieving embeddings.
+- **Contextual Awareness**: Enhances LLM responses by retrieving relevant information from your knowledge base (Guides).
+- **Text Splitting**: Intelligent text chunking using **LangChain** for optimal embedding generation.
 
-[DEMO](diamond-llm.vercel.app)
+### 👥 Groups & Permissions
+- **Organization Support**: Create and manage groups (e.g., teams, departments).
+- **Access Control (ACL)**: Granular permissions for group members (e.g., `guide:read`, `guide:create`).
+- **Public & Private Guides**: Support for both public guides and private group-specific knowledge bases.
 
-## ✨ Features
+### 📝 Content Management
+- **Code Editor**: **Monaco Editor** integration for creating and editing guides.
+- **Markdown Support**: Full markdown support for guide content.
+- **Guide Management**: Create, edit, and delete guides.
+- **Background Processing**: **BullMQ** handles heavy tasks like embedding generation asynchronously.
 
-- **Reactive Interface**: Built with Vue.js and Nuxt UI for a modern user experience.
-- **Streaming Responses**: Receive real-time answers from the language model.
-- **RAG with Upstash**: Utilizes a vector database to provide additional context to the AI's responses.
-- **Syntax Highlighting**: Code blocks in responses are automatically highlighted.
-- **Integrated Backend**: The Nuxt API manages secure communication with AI services.
-- **Text Splitting**: Uses [LangChain](https://js.langchain.com/) for text processing and splitting.
+### 🛠️ Technical Stack
+- **Framework**: [Nuxt 4](https://nuxt.com/) (Vue.js)
+- **UI Library**: [Nuxt UI](https://ui.nuxt.com/) (TailwindCSS)
+- **Database**: PostgreSQL with [Drizzle ORM](https://orm.drizzle.team/)
+- **Vector DB**: [Upstash Vector](https://upstash.com/vector)
+- **Queues**: [BullMQ](https://bullmq.io/) with Redis
+- **Auth**: [Nuxt Auth Utils](https://github.com/atinux/nuxt-auth-utils)
+- **Runtime**: [Bun](https://bun.sh/)
+
+---
 
 ## 🚀 Getting Started
 
-Follow the steps below to set up and run the project in your local environment.
-
 ### 1. Prerequisites
-
-- [Node.js](https://nodejs.org/en/) (version 20.x or higher)
-- [Bun](https://bun.sh/)
+- **Node.js** (v20+)
+- **Bun** (latest)
+- **PostgreSQL** database
+- **Redis** instance (for BullMQ)
+- **Upstash Vector** database
 
 ### 2. Installation
 
-Clone the repository and install the dependencies using `bun`:
-
 ```bash
-# Clone the project
+# Clone the repository
 git clone https://github.com/TutorFx/diamondlm.git
 
 # Navigate to the directory
@@ -45,48 +61,60 @@ cd diamond-llm
 bun install
 ```
 
-### 3. Environment Variables
+### 3. Environment Setup
 
-Create a `.env` file in the project root. It is required to store API keys and other sensitive settings.
+Create a `.env` file in the root directory:
 
 ```env
-# Google Gemini API Key
-GOOGLE_API_KEY="YOUR_KEY_HERE"
+POSTGRES_USER="testuser"
+POSTGRES_PASSWORD="testpass"
+POSTGRES_DB="dbname"
+POSTGRES_PORT=9293
+POSTGRES_HOSTNAME="127.0.0.1"
 
-# Upstash Vector Credentials
-UPSTASH_VECTOR_REST_URL="YOUR_URL_HERE"
-UPSTASH_VECTOR_REST_TOKEN="YOUR_TOKEN_HERE"
+
+OLLAMA_BASE_URL="http://127.0.0.1:11434/api"
+
+REDIS_PASSWORD=sua_senha_secreta_redis
+REDIS_PORT=6379
 ```
 
-### 4. Running in Development
+### 4. Database Setup
 
-Start the development server. The application will be available at `http://localhost:3000`.
+Run migrations to set up the database schema:
+
+```bash
+bun run db:generate
+bun run db:migrate
+```
+
+### 5. Running Development Server
 
 ```bash
 bun run dev
 ```
+The application will be available at `http://localhost:3000`.
 
-## ▶️ Available Commands
+---
 
-- `bun run dev`: Starts the development server with hot-reloading.
-- `bun run build`: Compiles the application for production.
-- `bun run preview`: Previews the production build locally.
-- `bun run lint`: Runs ESLint to find and fix issues in the code.
-- `bun run typecheck`: Performs a type check on the entire project with TypeScript.
-
-## 📁 Directory Structure
-
-The project follows the standard Nuxt 4 directory structure:
+## 📁 Project Structure
 
 ```
-/diamond-llm
-├── app/              # Contains all frontend logic
-│   ├── components/     # Reusable Vue components
-│   ├── layouts/        # Application layouts
-│   └── pages/          # Pages and routing system
-├── server/           # Backend logic
-│   └── api/            # API endpoints
-├── public/           # Static assets
-├── nuxt.config.ts    # Main Nuxt configuration file
-└── package.json      # Dependencies and scripts
+diamond-llm/
+├── app/                  # Frontend logic (Nuxt)
+│   ├── components/       # Vue components
+│   ├── composables/      # Shared logic (hooks)
+│   ├── layouts/          # Page layouts
+│   ├── pages/            # File-based routing
+│   └── plugins/          # Nuxt plugins
+├── server/               # Backend logic (Nitro)
+│   ├── api/              # API endpoints
+│   ├── database/         # Drizzle schema & config
+│   └── utils/            # Server-side utilities
+├── shared/               # Shared types and utils
+└── public/               # Static assets
 ```
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.

@@ -3,7 +3,9 @@ export default defineNuxtConfig({
   modules: [
     '@nuxt/eslint',
     '@nuxt/ui',
-    '@nuxtjs/mdc'
+    '@nuxtjs/mdc',
+    'nuxt-auth-utils',
+    'nuxt-monaco-editor'
   ],
 
   devtools: {
@@ -21,6 +23,16 @@ export default defineNuxtConfig({
   },
 
   compatibilityDate: '2025-01-15',
+
+  nitro: {
+    experimental: {
+      tasks: true
+    },
+    preset: 'bun',
+    scheduledTasks: {
+      '*/10 * * * * *': ['queue:process']
+    }
+  },
 
   eslint: {
     config: {

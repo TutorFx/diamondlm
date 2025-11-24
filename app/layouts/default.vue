@@ -1,10 +1,110 @@
 <script setup lang="ts">
+import { LazyModalConfirm } from '#components'
+
+const route = useRoute()
+const toast = useToast()
+const overlay = useOverlay()
+const { loggedIn, openInPopup } = useUserSession()
+
 const open = ref(false)
+
+const deleteModal = overlay.create(LazyModalConfirm, {
+  props: {
+    title: 'Delete chat',
+    description: 'Are you sure you want to delete this chat? This cannot be undone.'
+  }
+})
+
+const { data: chats, refresh: refreshChats } = await useFetch('/api/chats', {
+  key: 'chats',
+  transform: data => data.map(chat => ({
+    id: chat.id,
+    label: chat.title || 'Untitled',
+    to: `/chat/${chat.id}`,
+    icon: 'i-lucide-message-circle',
+    createdAt: chat.createdAt
+  }))
+})
+
+onNuxtReady(async () => {
+  const first10 = (chats.value || []).slice(0, 10)
+  for (const chat of first10) {
+    // prefetch the chat and let the browser cache it
+    await $fetch(`/api/chats/${chat.id}`)
+  }
+})
+
+watch(loggedIn, () => {
+  refreshChats()
+
+  open.value = false
+})
+
+const { groups } = useChats(chats)
+
+const items = computed(() => groups.value?.flatMap((group) => {
+  return [{
+    label: group.label,
+    type: 'label' as const
+  }, ...group.items.map(item => ({
+    ...item,
+    slot: 'chat' as const,
+    icon: undefined,
+    class: item.label === 'Untitled' ? 'text-muted' : ''
+  }))]
+}))
+
+async function deleteChat(id: string) {
+  const instance = deleteModal.open()
+  const result = await instance.result
+  if (!result) {
+    return
+  }
+
+  await $fetch(`/api/chats/${id}`, { method: 'DELETE' })
+
+  toast.add({
+    title: 'Chat deleted',
+    description: 'Your chat has been deleted',
+    icon: 'i-lucide-trash'
+  })
+
+  refreshChats()
+
+  if (route.params.id === id) {
+    navigateTo('/')
+  }
+}
 
 defineShortcuts({
   c: () => {
     navigateTo('/')
   }
+})
+
+onMounted(async () => {
+  const cookie = useCookie('cookie-consent')
+  if (cookie.value === 'accepted') {
+    return
+  }
+
+  toast.add({
+    title: 'Utilizamos cookies próprios para aprimorar a sua experiência no nosso site.',
+    duration: 0,
+    close: false,
+    actions: [{
+      label: 'Aceitar',
+      color: 'neutral',
+      variant: 'outline',
+      onClick: () => {
+        cookie.value = 'accepted'
+      }
+    }, {
+      label: 'Negar',
+      color: 'neutral',
+      variant: 'ghost'
+    }]
+  })
 })
 </script>
 
@@ -18,7 +118,7 @@ defineShortcuts({
       resizable
       class="bg-elevated/50"
     >
-      <!--       <template #header="{ collapsed }">
+      <template #header="{ collapsed }">
         <NuxtLink to="/" class="flex items-end gap-0.5">
           <Logo class="h-8 w-auto shrink-0" />
           <span v-if="!collapsed" class="text-xl font-bold text-highlighted">Chat</span>
@@ -28,13 +128,13 @@ defineShortcuts({
           <UDashboardSearchButton collapsed />
           <UDashboardSidebarCollapse />
         </div>
-      </template> -->
+      </template>
 
-      <!-- <template #default="{ collapsed }">
+      <template #default="{ collapsed }">
         <div class="flex flex-col gap-1.5">
           <UButton
-            v-bind="collapsed ? { icon: 'i-lucide-plus' } : { label: 'New chat' }"
-            variant="soft"
+            v-bind="collapsed ? { icon: 'i-lucide-plus' } : { icon: 'i-lucide-plus', label: 'Nova conversa' }"
+            variant="solid"
             block
             to="/"
             @click="open = false"
@@ -45,8 +145,65 @@ defineShortcuts({
             <UDashboardSidebarCollapse />
           </template>
         </div>
-      </template> -->
+
+        <UNavigationMenu
+          v-if="!collapsed"
+          :items="items"
+          :collapsed="collapsed"
+          orientation="vertical"
+          :ui="{ link: 'overflow-hidden' }"
+        >
+          <template #chat-trailing="{ item }">
+            <div class="flex -mr-1.25 translate-x-full group-hover:translate-x-0 transition-transform">
+              <UButton
+                icon="i-lucide-x"
+                color="neutral"
+                variant="ghost"
+                size="xs"
+                class="text-muted hover:text-primary hover:bg-accented/50 focus-visible:bg-accented/50 p-0.5"
+                tabindex="-1"
+                @click.stop.prevent="deleteChat((item as any).id)"
+              />
+            </div>
+          </template>
+        </UNavigationMenu>
+      </template>
+
+      <template #footer="{ collapsed }">
+        <UserMenu v-if="loggedIn" :collapsed="collapsed" />
+        <div v-else class="grid gap-4 w-full">
+          <UButton
+            :label="collapsed ? '' : 'Login with GitHub'"
+            icon="i-simple-icons-github"
+            color="neutral"
+            variant="ghost"
+            class="w-full"
+            @click="openInPopup('/auth/github')"
+          />
+          <ModalAuth>
+            <UButton
+              :label="collapsed ? '' : 'Entrar'"
+              icon="mdi:login"
+              color="neutral"
+              variant="ghost"
+              class="w-full"
+            />
+          </ModalAuth>
+        </div>
+      </template>
     </UDashboardSidebar>
+
+    <UDashboardSearch
+      placeholder="Search chats..."
+      :groups="[{
+        id: 'links',
+        items: [{
+          label: 'Nova conversa',
+          to: '/',
+          icon: 'i-lucide-square-pen'
+        }]
+      }, ...groups]"
+    />
 
     <slot />
   </UDashboardGroup>
