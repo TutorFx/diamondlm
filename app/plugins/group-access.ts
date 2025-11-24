@@ -14,7 +14,7 @@ export default defineNuxtPlugin(() => {
     const groupSlug = to.params.groupSlug as string
     const hasAccess = groups.value.some(group => group.slug === groupSlug)
 
-    if (!hasAccess) {
+    if (!hasAccess && groupSlug !== 'public') {
       return createError({
         statusCode: 404,
         statusMessage: 'Not Found'

@@ -15,7 +15,11 @@ const tabItems = [{
 }]
 const selectedTab = ref('all')
 
-const { data: guides } = await useFetch<Guide[]>('/api/guides', { default: () => [] })
+const { group } = useGroup()
+
+const query = computed(() => group.value ? `/api/group/${group.value.id}/guides` : '/api/guides')
+
+const { data: guides } = await useFetch<Guide[]>(query.value, { default: () => [] })
 
 const selectedGuide = ref<number | null>()
 

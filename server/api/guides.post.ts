@@ -1,6 +1,8 @@
 import { z } from 'zod/v4'
 import { generateText } from 'ai'
 import { useEmbeddingQueue } from '../utils/queue'
+import { PERMISSIONS } from '../../shared/utils/permissions'
+import { and, eq, sql } from 'drizzle-orm'
 
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
@@ -12,9 +14,29 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const { content } = await readValidatedBody(event, z.object({
-    content: z.string().min(1)
+  const { content, groupId } = await readValidatedBody(event, z.object({
+    content: z.string().min(1),
+    groupId: z.uuid().nullish().optional()
   }).parse)
+
+  const db = useDrizzle()
+
+  if (groupId) {
+    const [member] = await db.select()
+      .from(tables.groupMembers)
+      .where(and(
+        eq(tables.groupMembers.groupId, groupId),
+        eq(tables.groupMembers.userId, session.user.id),
+        sql`${tables.groupMembers.permissions} @> jsonb_build_array(${PERMISSIONS.GUIDE.CREATE}::text)`
+      ))
+
+    if (!member) {
+      throw createError({
+        statusCode: 403,
+        message: 'You do not have permission to create guides in this group'
+      })
+    }
+  }
 
   const llm = useOllama()
 
@@ -29,12 +51,11 @@ export default defineEventHandler(async (event) => {
     prompt: content
   })
 
-  const db = useDrizzle()
-
   const newGuide = await db.transaction(async (tx) => {
     const [guide] = await tx.insert(tables.guides).values({
       title,
       content,
+      groupId,
       createdAt: new Date(),
       updatedAt: new Date()
     }).returning()

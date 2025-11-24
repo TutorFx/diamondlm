@@ -1,5 +1,7 @@
 import { Queue, Worker } from 'bullmq'
 import IORedis from 'ioredis'
+import { useDrizzle, tables, eq } from './drizzle'
+import { useEmbedding } from './embedding'
 
 const connection = new IORedis({
   host: process.env.REDIS_HOST || 'localhost',
@@ -21,16 +23,25 @@ export function createEmbeddingWorker() {
     const db = useDrizzle()
     const { generateEmbedding } = useEmbedding()
 
-    const chunkData = await db.query.chunk.findFirst({
-      where: eq(tables.chunk.id, job.data.chunkId)
-    })
+    const [chunkData] = await db
+      .select({
+        content: tables.chunk.content,
+        guideTitle: tables.guides.title
+      })
+      .from(tables.chunk)
+      .leftJoin(tables.guides, eq(tables.chunk.guideId, tables.guides.id))
+      .where(eq(tables.chunk.id, job.data.chunkId))
 
     if (!chunkData) {
       console.warn(`[BullMQ] Chunk ${job.data.chunkId} não encontrado.`)
       return
     }
 
-    const embedding = await generateEmbedding(chunkData.content)
+    const contentToEmbed = chunkData.guideTitle
+      ? `${chunkData.guideTitle}: ${chunkData.content}`
+      : chunkData.content
+
+    const embedding = await generateEmbedding(contentToEmbed)
 
     await db.update(tables.chunk)
       .set({

@@ -8,6 +8,8 @@ const state = reactive({
   content: undefined
 })
 
+const { groups, group } = useGroup()
+
 const toast = useToast()
 const router = useRouter()
 const colorMode = useColorMode()
@@ -15,10 +17,15 @@ const colorMode = useColorMode()
 async function onSubmit() {
   await $fetch('/api/guides', {
     method: 'POST',
-    body: state
+    body: {
+      ...state,
+      groupId: group.value ? group.value.id : null
+    }
   }).then(() => {
     toast.add({ title: 'Guia criado com sucesso!' })
-    router.push('/dashboard/guide')
+    router.push({ name: 'dashboard-groupSlug-guide', params: {
+      groupSlug: group.value ? group.value.slug : 'public'
+    } })
   }).catch(() => {
     toast.add({ title: 'Erro ao criar guia', color: 'error' })
   })

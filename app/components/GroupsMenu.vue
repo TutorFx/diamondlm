@@ -7,8 +7,13 @@ defineProps<{
 
 const { groups, group } = useGroup()
 
+const route = useRoute()
+
 const selectedGroup = computed(() => {
-  const sgroup = groups.value!.find(g => g.slug === group.value.slug)
+  const sgroup = route.params.groupSlug === 'public' ? {
+    name: 'Public',
+    slug: 'public'
+  } : group.value!
 
   if (!sgroup) return createError({
     statusCode: 404,
@@ -24,8 +29,8 @@ const selectedGroup = computed(() => {
 })
 
 const items = computed<DropdownMenuItem[][]>(() => {
-  return [groups.value!.map(group => ({
-    label: group.name,
+  return [[...groups.value!.map(group => ({
+    label: group?.name,
     avatar: {
       alt: group.name
     },
@@ -35,7 +40,19 @@ const items = computed<DropdownMenuItem[][]>(() => {
         params: { groupSlug: group.slug }
       })
     }
-  })), [{
+  })),
+  {
+    label: 'Public',
+    avatar: {
+      alt: 'Public'
+    },
+    onSelect() {
+      navigateTo({
+        name: 'dashboard-groupSlug-guide',
+        params: { groupSlug: 'public' }
+      })
+    }
+  }], [{
     label: 'Create group',
     icon: 'i-lucide-circle-plus'
   }, {
@@ -46,7 +63,7 @@ const items = computed<DropdownMenuItem[][]>(() => {
 </script>
 
 <template>
-  <UDropdownMenu :items="items" :content="{ align: 'center', collisionPadding: 12 }"
+  <UDropdownMenu :items="items" :content="{ align: 'center', collisionPadding: 12 }" :loading="!groups"
     :ui="{ content: collapsed ? 'w-40' : 'w-(--reka-dropdown-menu-trigger-width)' }">
     <UButton v-bind="{
       ...selectedGroup,
