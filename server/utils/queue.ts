@@ -3,20 +3,29 @@ import IORedis from 'ioredis'
 import { useDrizzle, tables, eq } from './drizzle'
 import { useEmbedding } from './embedding'
 
-const connection = new IORedis({
-  host: process.env.REDIS_HOST || 'localhost',
-  port: Number(process.env.REDIS_PORT) || 6379,
-  password: process.env.REDIS_PASSWORD,
-  maxRetriesPerRequest: null
-})
+let redis: null | IORedis
+
+export function useRedis() {
+  if (!redis) {
+    redis = new IORedis({
+      host: process.env.REDIS_HOST || 'localhost',
+      port: Number(process.env.REDIS_PORT) || 6379,
+      password: process.env.REDIS_PASSWORD,
+      maxRetriesPerRequest: null
+    })
+  }
+  return redis
+}
 
 export const EMBEDDING_QUEUE_NAME = 'embedding-generation'
 
 export function useEmbeddingQueue() {
+  const connection = useRedis()
   return new Queue(EMBEDDING_QUEUE_NAME, { connection })
 }
 
 export function createEmbeddingWorker() {
+  const connection = useRedis()
   const worker = new Worker(EMBEDDING_QUEUE_NAME, async (job) => {
     console.log(`[BullMQ] Processando chunk ID: ${job.data.chunkId}`)
 

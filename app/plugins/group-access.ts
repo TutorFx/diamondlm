@@ -1,5 +1,9 @@
 export default defineNuxtPlugin(() => {
   addRouteMiddleware('validate-group-access', async (to) => {
+    if (import.meta.prerender) {
+      return
+    }
+
     const headers = useRequestHeaders(['cookie'])
 
     const { data: groups } = await useAsyncData('group-access', (_nuxtApp, { signal }) => $fetch<GroupWithUserPermissions[]>('/api/user-groups', { signal, headers }))

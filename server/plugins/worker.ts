@@ -1,6 +1,10 @@
 import { isNull } from 'drizzle-orm'
 
 export default defineNitroPlugin(async (nitroApp) => {
+  if (import.meta.prerender) {
+    return
+  }
+
   console.log('[Plugin] Inicializando Worker do BullMQ...')
 
   const worker = createEmbeddingWorker()
