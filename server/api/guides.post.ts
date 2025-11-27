@@ -48,7 +48,7 @@ export default defineEventHandler(async (event) => {
         - The title should be a summary of the user's message
         - Do not use quotes (' or ") or colons (:) or any other punctuation
         - Do not use markdown, just plain text`,
-    prompt: content
+    prompt: content.slice(0, 1000)
   })
 
   const newGuide = await db.transaction(async (tx) => {
