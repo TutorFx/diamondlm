@@ -46,7 +46,7 @@ export function useEmbedding() {
         userId ? eq(groupMembers.userId, userId) : sql`FALSE`
       ))
       .where(and(
-        gt(similarity, 0.3),
+        gt(similarity, 0.0),
         or(
           isNull(guides.groupId),
           sql`${groupMembers.permissions} @> jsonb_build_array(${PERMISSIONS.GUIDE.READ}::text)`
