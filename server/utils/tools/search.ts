@@ -1,6 +1,5 @@
 import { tool } from 'ai'
 import { z } from 'zod'
-import { encode } from '@toon-format/toon'
 
 type DeltaCallback = (delta: string) => void | Promise<void>
 
@@ -30,10 +29,13 @@ export function searchTool(searchParameters: SearchParameters) {
         }
       }
 
-      return JSON.stringify({
-        resultsFor: search,
-        results: encode(results)
-      })
+      if (results.length === 0) return '<no_context_available />'
+
+      return results.map(result => `
+        <document id="${result.chunk.id}" relevance="${result.similarity.toFixed(2)}" source="${result.guide.title}">
+            ${result.chunk.content}
+        </document>
+      `).join('\n')
     }
   })
 }

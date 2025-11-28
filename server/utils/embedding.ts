@@ -36,7 +36,8 @@ export function useEmbedding() {
           title: guides.title
         },
         chunk: {
-          content: chunk.content
+          content: chunk.content,
+          id: chunk.id
         }
       })
       .from(chunk)
