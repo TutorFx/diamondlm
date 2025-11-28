@@ -31,7 +31,12 @@ export default defineNuxtConfig({
     preset: 'bun',
     scheduledTasks: {
       '*/10 * * * * *': ['queue:process']
-    }
+    },
+    hooks: {
+      'dev:reload': () => {
+        require('onnxruntime-node');
+      },
+    },
   },
 
   eslint: {
