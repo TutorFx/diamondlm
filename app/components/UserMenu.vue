@@ -12,8 +12,8 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
   type: 'label',
   label: user.value?.name,
   avatar: {
-    src: user.value?.avatar,
-    alt: user.value?.name
+    src: user.value?.avatar || undefined,
+    alt: user.value?.name || undefined
   }
 }], [{
   label: 'Aparência',

@@ -24,6 +24,7 @@ export function searchTool(searchParameters: SearchParameters) {
       if (typeof searchParameters?.onDelta === 'function') {
         for (let i = 0; i < results.length; i++) {
           const delta = results[i]
+          if (!delta) continue
 
           await searchParameters.onDelta(delta.chunk.content)
         }

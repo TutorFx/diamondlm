@@ -44,8 +44,10 @@ export default defineEventHandler(async (event) => {
 
   for (let ocIndex = 0; ocIndex < oldChunks.length; ocIndex++) {
     const oldChunk = oldChunks[ocIndex]
+    if (!oldChunk) continue
     for (let ncIndex = 0; ncIndex < newChunks.length; ncIndex++) {
       const newChunk = newChunks[ncIndex]
+      if (!newChunk) continue
 
       if (oldChunk.content === newChunk.pageContent) {
         pointers.set(ocIndex, ncIndex)
@@ -69,9 +71,11 @@ export default defineEventHandler(async (event) => {
 
     if (chunksThatNoExist.length > 0) {
       const insertedChunks = await tx.insert(tables.chunk).values(chunksThatNoExist.map((newChunkIndex) => {
+        const chunk = newChunks[newChunkIndex]
+        if (!chunk) throw new Error('Chunk not found')
         return {
           guideId: Number(id),
-          content: newChunks[newChunkIndex].pageContent,
+          content: chunk.pageContent,
           embedding: null
         }
       })).returning({ id: tables.chunk.id })

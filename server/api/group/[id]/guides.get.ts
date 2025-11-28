@@ -4,6 +4,13 @@ import { PERMISSIONS } from '../../../../shared/utils/permissions'
 
 export default defineEventHandler(async (event) => {
   const { id } = getRouterParams(event)
+
+  if (!id) {
+    throw createError({
+      statusCode: 400,
+      message: 'Missing id'
+    })
+  }
   const session = await getUserSession(event)
 
   if (!session.user) {

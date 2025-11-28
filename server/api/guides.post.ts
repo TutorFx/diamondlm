@@ -60,6 +60,13 @@ export default defineEventHandler(async (event) => {
       updatedAt: new Date()
     }).returning()
 
+    if (!guide) {
+      throw createError({
+        statusCode: 500,
+        message: 'Failed to create guide'
+      })
+    }
+
     const chunks = await splitText({ title, content })
 
     if (chunks.length > 0) {

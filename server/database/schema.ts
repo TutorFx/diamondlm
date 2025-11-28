@@ -1,5 +1,6 @@
 import { relations } from 'drizzle-orm'
 import { index, integer, json, jsonb, pgEnum, pgTable, primaryKey, serial, text, timestamp, uniqueIndex, varchar, vector } from 'drizzle-orm/pg-core'
+import type { GroupMemberPermission } from '../../shared/types'
 
 const timestamps = {
   createdAt: timestamp().defaultNow().notNull(),

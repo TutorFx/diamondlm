@@ -42,6 +42,8 @@ async function runSeed() {
     })
     .returning()
 
+  if (!group) throw new Error('Failed to create group')
+
   console.log(`Grupo criado: ${group.name} (ID: ${group.id})`)
 
   // Criar Usuário
@@ -54,6 +56,8 @@ async function runSeed() {
       password: '$argon2id$v=19$m=65536,t=3,p=4$Tr/J52XFebvotDC2SFXzlg$orHFwV6tDtCv0nt55U5ZMefO7DiXIwp1gu7+Bg+MdHA'
     })
     .returning()
+
+  if (!user) throw new Error('Failed to create user')
 
   console.log(`Usuário criado: ${user.name} (ID: ${user.id})`)
 
@@ -84,6 +88,8 @@ async function runSeed() {
         groupId: group.id
       })
       .returning({ insertedId: tables.guides.id })
+
+    if (!newGuide) throw new Error('Failed to create guide')
 
     const guideId = newGuide.insertedId
     console.log(`Guia "${doc.title}" criado com ID: ${guideId}.`)
