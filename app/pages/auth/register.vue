@@ -5,5 +5,11 @@ definePageMeta({
 </script>
 
 <template>
-  <AuthRegister />
+  <AuthPage>
+    <AuthRegister>
+      <template #description>
+        Já tem conta? <ULink :to="{ name: 'auth-login' }">Faça login</ULink>
+      </template>
+    </AuthRegister>
+  </AuthPage>
 </template>

@@ -62,8 +62,7 @@ export default defineEventHandler(async (event) => {
     execute: ({ writer }) => {
       const result = streamText({
         model: llm(model),
-        system:
-        /* xml */`
+        system: /* xml */`
 <system_configuration>
   <agent_profile>
     <identity>

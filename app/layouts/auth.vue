@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  <UDashboardGroup unit="rem">
+  <div class="min-h-dvh grid">
     <slot />
-  </UDashboardGroup>
+  </div>
 </template>

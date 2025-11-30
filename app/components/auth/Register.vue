@@ -1,6 +1,14 @@
-<script setup lang="ts">
+<script lang="ts">
 import type { AuthFormField, FormSubmitEvent } from '@nuxt/ui'
 import type { z } from 'zod/v4'
+
+export interface RegisterSlots {
+  description: (props?: object) => unknown
+}
+</script>
+
+<script setup lang="ts">
+const slots = defineSlots<RegisterSlots>()
 
 const { fetch: fetchUserSession } = useUserSession()
 const { handler } = useRequestErrorHandler.asToast()
@@ -39,16 +47,14 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
   <UAuthForm
     :on-submit
     title="Registrar"
-    description="Digite suas credenciais para acessar sua conta."
-    icon="i-lucide-user"
+    description="Preencha os campos abaixo para prosseguir."
+    icon="lucide:user-plus"
+    :submit="{ label: 'Entrar' }"
     :fields="fields"
     :schema
-    :separator="{
-      icon: 'i-lucide-user'
-    }"
   >
-    <template #description>
-      Já tem uma conta? <ULink to="#" class="text-primary font-medium">Log in</ULink>.
+    <template v-if="'description' in slots" #description>
+      <slot name="description" />
     </template>
   </UAuthForm>
 </template>
