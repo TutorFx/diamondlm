@@ -52,7 +52,37 @@ const quickChats = [
 
     <template #body>
       <UContainer class="flex-1 flex flex-col justify-center gap-4 sm:gap-6 py-8">
-        home
+        <h1 class="text-3xl sm:text-4xl text-highlighted font-bold">
+          Olá! Como posso te ajudar hoje?
+        </h1>
+
+        <UChatPrompt
+          v-model="input"
+          :status="loading ? 'streaming' : 'ready'"
+          class="[view-transition-name:chat-prompt]"
+          variant="subtle"
+          @submit="onSubmit"
+        >
+          <UChatPromptSubmit color="neutral" />
+
+          <template #footer>
+            <ModelSelect v-model="model" />
+          </template>
+        </UChatPrompt>
+
+        <div class="flex flex-wrap gap-2">
+          <UButton
+            v-for="quickChat in quickChats"
+            :key="quickChat.label"
+            :icon="quickChat.icon"
+            :label="quickChat.label"
+            size="sm"
+            color="neutral"
+            variant="outline"
+            class="rounded-full"
+            @click="createChat(quickChat.label)"
+          />
+        </div>
       </UContainer>
     </template>
   </UDashboardPanel>

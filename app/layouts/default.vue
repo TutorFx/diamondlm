@@ -72,13 +72,13 @@ async function deleteChat(id: string) {
   refreshChats()
 
   if (route.params.id === id) {
-    navigateTo('/')
+    navigateTo('/new-chat')
   }
 }
 
 defineShortcuts({
   c: () => {
-    navigateTo('/')
+    navigateTo('/new-chat')
   }
 })
 
@@ -119,7 +119,7 @@ onMounted(async () => {
       class="bg-elevated/50"
     >
       <template #header="{ collapsed }">
-        <NuxtLink to="/" class="flex items-end gap-0.5">
+        <NuxtLink to="/new-chat" class="flex items-end gap-0.5">
           <Logo class="h-8 w-auto shrink-0" />
           <span v-if="!collapsed" class="text-xl font-bold text-highlighted">Chat</span>
         </NuxtLink>
@@ -136,7 +136,7 @@ onMounted(async () => {
             v-bind="collapsed ? { icon: 'i-lucide-plus' } : { icon: 'i-lucide-plus', label: 'Nova conversa' }"
             variant="solid"
             block
-            to="/"
+            to="/new-chat"
             @click="open = false"
           />
 
@@ -199,7 +199,7 @@ onMounted(async () => {
         id: 'links',
         items: [{
           label: 'Nova conversa',
-          to: '/',
+          to: '/new-chat',
           icon: 'i-lucide-square-pen'
         }]
       }, ...groups]"

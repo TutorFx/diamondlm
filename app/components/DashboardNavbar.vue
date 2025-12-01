@@ -10,7 +10,7 @@
         color="neutral"
         variant="ghost"
         icon="i-lucide-plus"
-        to="/"
+        to="/new-chat"
         class="lg:hidden"
       />
     </template>
