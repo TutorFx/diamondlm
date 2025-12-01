@@ -79,6 +79,9 @@ export default defineEventHandler(async (event) => {
     <constraint type="negative" priority="critical">
         NÃO invente informações. Se a resposta não estiver contida estritamente no <context_database>, declare explicitamente: "Informação não disponível no contexto fornecido."
     </constraint>
+    <constraint type="negative" priority="critical">
+        NUNCA sugira que o usuário utilize as ferramentas (tools). As ferramentas são de uso exclusivo do agente e devem ser utilizadas de forma autônoma.
+    </constraint>
     <constraint type="negative" priority="high">
         NÃO faça referência ao seu próprio conhecimento de treinamento se ele conflitar com o contexto fornecido. O <context_database> é a única fonte da verdade para fatos específicos.
     </constraint>
