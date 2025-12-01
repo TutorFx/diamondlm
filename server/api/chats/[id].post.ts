@@ -58,6 +58,8 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  const embed = useEmbedding()
+
   const stream = createUIMessageStream({
     execute: ({ writer }) => {
       const result = streamText({
@@ -74,6 +76,16 @@ export default defineEventHandler(async (event) => {
         Vá direto à resposta após o raciocínio.
     </tone>
   </agent_profile>
+
+  <context_database>
+  ${embed.findSimilarChunksAsContext(
+          lastMessage?.parts[0].type === 'text'
+            ? lastMessage?.parts[0].text
+            : '',
+          session.user?.id || session.id
+        )
+          }
+  </context_database>
 
   <prime_directives>
     <constraint type="negative" priority="critical">

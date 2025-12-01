@@ -16,9 +16,7 @@ export function searchTool(searchParameters: SearchParameters) {
       search: z.string().describe('A pergunta específica ou o tópico sobre o qual o colaborador precisa de informação, para ser usado na busca dos documentos.')
     }),
     execute: async ({ search }) => {
-      const results = await embed.findSimilarGuides(search, searchParameters.userId)
-
-      console.log(results)
+      const results = await embed.findSimilarChunks(search, searchParameters.userId)
 
       if (typeof searchParameters?.onDelta === 'function') {
         for (let i = 0; i < results.length; i++) {
@@ -29,13 +27,15 @@ export function searchTool(searchParameters: SearchParameters) {
         }
       }
 
-      if (results.length === 0) return '<no_context_available />'
+      if (results.length === 0) return '<context_database><no_context_available /></context_database>'
 
-      return results.map(result => `
-        <document id="${result.chunk.id}" relevance="${result.similarity.toFixed(2)}" source="${result.guide.title}">
-            ${result.chunk.content}
-        </document>
-      `).join('\n')
+      return `<context_database>\n
+        ${results.map(result => `
+          <document id="${result.chunk.id}" relevance="${result.similarity.toFixed(2)}" source="${result.guide.title}">
+              ${result.chunk.content}
+          </document>
+        `).join('\n')}\n
+      </context_database>`
     }
   })
 }

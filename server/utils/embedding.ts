@@ -25,7 +25,7 @@ export function useEmbedding() {
     return embeddings
   }
 
-  const findSimilarGuides = async (search: string, userId: string | null) => {
+  const findSimilarChunks = async (search: string, userId: string | null) => {
     console.log('Gerando embedding para a descrição fornecida...')
     const embedding = await generateEmbedding(search)
     const similarity = sql<number>`1 - (${cosineDistance(chunk.embedding, embedding)})`
@@ -58,5 +58,17 @@ export function useEmbedding() {
     return similarGuides
   }
 
-  return { findSimilarGuides, generateEmbedding, generateManyEmbeddings }
+  const findSimilarChunksAsContext = async (search: string, userId: string | null) => {
+    const results = await findSimilarChunks(search, userId)
+
+    if (results.length === 0) return '<no_context_available />'
+
+    return results.map(result => `
+      <document id="${result.chunk.id}" relevance="${result.similarity.toFixed(2)}" source="${result.guide.title}">
+          ${result.chunk.content}
+      </document>
+    `).join('\n')
+  }
+
+  return { findSimilarChunks, findSimilarChunksAsContext, generateEmbedding, generateManyEmbeddings }
 }
