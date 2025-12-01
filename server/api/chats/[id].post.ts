@@ -61,7 +61,7 @@ export default defineEventHandler(async (event) => {
   const embed = useEmbedding()
 
   const stream = createUIMessageStream({
-    execute: ({ writer }) => {
+    execute: async ({ writer }) => {
       const result = streamText({
         model: llm(model),
         system: /* xml */`
@@ -78,7 +78,7 @@ export default defineEventHandler(async (event) => {
   </agent_profile>
 
   <context_database>
-  ${lastMessage?.parts[0].type === 'text' ? embed.findSimilarChunksAsContext(
+  ${lastMessage?.parts[0].type === 'text' ? await embed.findSimilarChunksAsContext(
     lastMessage?.parts[0].text,
     session.user?.id || session.id
   ) : '<no_context_available />'}
