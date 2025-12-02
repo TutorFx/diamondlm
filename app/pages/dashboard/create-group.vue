@@ -63,14 +63,9 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 
 <template>
   <UDashboardPanel>
-    <UHeader title="Criar Novo Grupo">
-      <template #left>
-        <UButton
-          variant="ghost"
-          color="neutral"
-          icon="i-lucide-arrow-left"
-          to="/"
-        />
+    <UDashboardNavbar title="Criar Novo Grupo">
+      <template #leading>
+        <UDashboardSidebarCollapse />
       </template>
 
       <template #right>
@@ -83,7 +78,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
           @click="form.submit()"
         />
       </template>
-    </UHeader>
+    </UDashboardNavbar>
 
     <UContainer class="flex-1 flex flex-col items-center justify-center w-full max-w-lg py-12">
       <div class="text-center mb-8">
