@@ -1,6 +1,4 @@
 <script setup lang="ts">
-const { model } = useModels()
-
 async function createChat(prompt: string) {
   const chat = await $fetch('/api/chats', {
     method: 'POST',
@@ -57,8 +55,8 @@ const topicCards = [
         <!-- Hero Section -->
         <div class="text-center space-y-4">
           <div class="flex items-center justify-center gap-2 mb-6">
-            <img src="/icon-atlas.svg" class="h-28 block dark:hidden" />
-            <img src="/icon-atlas-branco.svg" class="h-28 hidden dark:block" />
+            <img src="/icon-atlas.svg" class="h-28 block dark:hidden">
+            <img src="/icon-atlas-branco.svg" class="h-28 hidden dark:block">
             <img src="/icon-atlas.svg" class="h-28 block dark:hidden">
             <img src="/icon-atlas-branco.svg" class="h-28 hidden dark:block">
           </div>
