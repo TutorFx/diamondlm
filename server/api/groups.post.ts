@@ -1,7 +1,9 @@
 import { PERMISSIONS } from '../../shared/utils/permissions'
+import { eq } from 'drizzle-orm'
 
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
+
   if (!session.user) {
     throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
   }
@@ -15,6 +17,18 @@ export default defineEventHandler(async (event) => {
   const db = useDrizzle()
 
   return await db.transaction(async (tx) => {
+    const [user] = await tx.select().from(tables.users).where(eq(tables.users.id, session.user?.id || session.id))
+
+    if (!user) {
+      throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
+    }
+
+    if (!user.permissions.includes(PERMISSIONS.USER.GROUP_CREATE)) {
+      throw createError({ statusCode: 403, statusMessage: 'Forbidden' })
+    }
+
+    const slug = await getAvailableSlug(db, name)
+
     const [group] = await tx.insert(tables.groups).values({
       name,
       slug

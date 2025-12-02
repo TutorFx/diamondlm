@@ -5,8 +5,7 @@ export const PERMISSIONS = {
     READ: 'group:read',
     UPDATE: 'group:update',
     DELETE: 'group:delete',
-    MANAGE_MEMBERS: 'group:members:manage',
-    CREATE: 'group:create'
+    MANAGE_MEMBERS: 'group:members:manage'
   },
   GUIDE: {
     READ: 'group:guide:read',
@@ -15,7 +14,7 @@ export const PERMISSIONS = {
     DELETE: 'group:guide:delete'
   },
   USER: {
-    ADMIN: 'user:admin'
+    GROUP_CREATE: 'group:create'
   }
 } as const
 

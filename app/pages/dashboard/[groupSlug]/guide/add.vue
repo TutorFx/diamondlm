@@ -39,18 +39,27 @@ async function onSubmit() {
     <UDashboardNavbar :toggle="false" title="Adicionar Guia" icon="i-lucide-plus">
       <template #right>
         <UTooltip text="Salvar">
-          <UButton icon="i-lucide-send" color="neutral" variant="ghost" :disabled="state.content === undefined"
-            @click="onSubmit" />
+          <UButton
+            icon="i-lucide-send"
+            color="neutral"
+            variant="ghost"
+            :disabled="state.content === undefined"
+            @click="onSubmit"
+          />
         </UTooltip>
       </template>
     </UDashboardNavbar>
 
     <div class="grid">
-      <MonacoEditor v-model="state.content" :options="{
-        wordWrap: 'on',
-        theme: colorMode.value === 'dark'
-          ? 'vs-dark' : 'vs-light'
-      }" lang="markdown" />
+      <MonacoEditor
+        v-model="state.content"
+        :options="{
+          wordWrap: 'on',
+          theme: colorMode.value === 'dark'
+            ? 'vs-dark' : 'vs-light'
+        }"
+        lang="markdown"
+      />
     </div>
   </UDashboardPanel>
 </template>
