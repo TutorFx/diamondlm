@@ -1,4 +1,3 @@
-import { PERMISSIONS } from '../../shared/utils/permissions'
 import { eq } from 'drizzle-orm'
 
 export default defineEventHandler(async (event) => {
