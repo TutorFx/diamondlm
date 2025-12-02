@@ -28,7 +28,6 @@ export default defineNuxtConfig({
     experimental: {
       tasks: true
     },
-    preset: 'bun',
     scheduledTasks: {
       '*/10 * * * * *': ['queue:process']
     }
