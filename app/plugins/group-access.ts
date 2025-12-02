@@ -1,10 +1,10 @@
 export default defineNuxtPlugin(() => {
+  const headers = useRequestHeaders(['cookie'])
+
   addRouteMiddleware('validate-group-access', async (to) => {
     if (import.meta.prerender) {
       return
     }
-
-    const headers = useRequestHeaders(['cookie'])
 
     const { data: groups } = await useAsyncData('group-access', (_nuxtApp, { signal }) => $fetch<GroupWithUserPermissions[]>('/api/user-groups', { signal, headers }))
 
@@ -22,6 +22,21 @@ export default defineNuxtPlugin(() => {
       return createError({
         statusCode: 404,
         statusMessage: 'Not Found'
+      })
+    }
+  })
+
+  addRouteMiddleware('validate-group-list', async () => {
+    if (import.meta.prerender) {
+      return
+    }
+
+    const { data: groups } = await useAsyncData('group-access', (_nuxtApp, { signal }) => $fetch<GroupWithUserPermissions[]>('/api/user-groups', { signal, headers }))
+
+    if (!groups.value) {
+      return createError({
+        statusCode: 401,
+        statusMessage: 'Unauthorized'
       })
     }
   })

@@ -1,6 +1,6 @@
 import { relations } from 'drizzle-orm'
 import { index, integer, json, jsonb, pgEnum, pgTable, primaryKey, serial, text, timestamp, uniqueIndex, varchar, vector } from 'drizzle-orm/pg-core'
-import type { GroupMemberPermission } from '../../shared/types'
+import type { GroupMemberPermission, UserPermission } from '../../shared/types'
 
 const timestamps = {
   createdAt: timestamp().defaultNow().notNull(),
@@ -61,6 +61,7 @@ export const users = pgTable('users', {
   avatar: varchar({ length: 500 }),
   provider: providerEnum().notNull(),
   providerId: varchar({ length: 50 }),
+  permissions: jsonb('permissions').$type<UserPermission[]>().notNull().default([]),
   ...timestamps
 }, table => [
   uniqueIndex('users_provider_id_idx').on(table.provider, table.providerId)

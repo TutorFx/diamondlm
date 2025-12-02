@@ -10,7 +10,7 @@ definePageMeta({
     <AuthLogin>
       <template #description>
         <div class="grid grid-flow-row place-items-center gap-2">
-          <img src="/icon-atlas-branco.svg" alt="Logo" class="h-20" />
+          <img src="/icon-atlas-branco.svg" alt="Logo" class="h-20">
 
           <h1 class="text-3xl font-semibold text-white">
             Bem-vindo ao <span class="text-teal-500">atlas</span>

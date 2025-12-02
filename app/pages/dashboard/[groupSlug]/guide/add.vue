@@ -1,6 +1,6 @@
 <script setup lang="ts">
 definePageMeta({
-  layout: 'dashboard',
+  layout: 'group-scope',
   middleware: 'validate-group-access'
 })
 
@@ -23,9 +23,11 @@ async function onSubmit() {
     }
   }).then(() => {
     toast.add({ title: 'Guia criado com sucesso!' })
-    router.push({ name: 'dashboard-groupSlug-guide', params: {
-      groupSlug: group.value ? group.value.slug : 'public'
-    } })
+    router.push({
+      name: 'dashboard-groupSlug-guide', params: {
+        groupSlug: group.value ? group.value.slug : 'public'
+      }
+    })
   }).catch(() => {
     toast.add({ title: 'Erro ao criar guia', color: 'error' })
   })

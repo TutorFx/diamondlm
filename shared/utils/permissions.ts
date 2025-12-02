@@ -12,8 +12,12 @@ export const PERMISSIONS = {
     CREATE: 'group:guide:create',
     UPDATE: 'group:guide:update',
     DELETE: 'group:guide:delete'
+  },
+  USER: {
+    GROUP_CREATE: 'group:create'
   }
 } as const
 
 export const groupPermissionSchema = z.enum(PERMISSIONS.GROUP)
 export const guidePermissionSchema = z.enum(PERMISSIONS.GUIDE)
+export const userPermissionSchema = z.enum(PERMISSIONS.USER)

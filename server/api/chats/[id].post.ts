@@ -78,10 +78,12 @@ export default defineEventHandler(async (event) => {
   </agent_profile>
 
   <context_database>
-  ${lastMessage?.parts[0].type === 'text' ? await embed.findSimilarChunksAsContext(
-    lastMessage?.parts[0].text,
-    session.user?.id || session.id
-  ) : '<no_context_available />'}
+  ${lastMessage?.parts[0].type === 'text'
+    ? await embed.findSimilarChunksAsContext(
+        lastMessage?.parts[0].text,
+        session.user?.id || session.id
+      )
+    : '<no_context_available />'}
   </context_database>
 
   <prime_directives>

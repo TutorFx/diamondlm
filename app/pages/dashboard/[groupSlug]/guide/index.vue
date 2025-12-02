@@ -2,7 +2,7 @@
 import { breakpointsTailwind, useBreakpoints } from '@vueuse/core'
 
 definePageMeta({
-  layout: 'dashboard',
+  layout: 'group-scope',
   middleware: 'validate-group-access'
 })
 
