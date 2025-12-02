@@ -12,7 +12,7 @@ const route = useRoute()
 const selectedGroup = computed(() => {
   if (route.name === 'dashboard-create-group') return {
     name: 'Create group',
-    icon: 'i-lucide-circle-plus',
+    icon: 'i-lucide-circle-plus'
   }
 
   const sgroup = route.params.groupSlug === 'public'

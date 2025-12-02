@@ -8,4 +8,5 @@ export type ValueOf<T> = T[keyof T]
 
 export type GroupPermission = ValueOf<typeof PERMISSIONS.GROUP>
 export type GuidePermission = ValueOf<typeof PERMISSIONS.GUIDE>
+export type UserPermission = ValueOf<typeof PERMISSIONS.USER>
 export type GroupMemberPermission = GroupPermission | GuidePermission
