@@ -19,12 +19,18 @@ const fields = ref<AuthFormField[]>([
   {
     name: 'email',
     type: 'text',
-    label: 'Email'
+    label: 'Email',
+    ui: {
+      base: 'bg-gray-200/50'
+    }
   },
   {
     name: 'password',
     type: 'password',
-    label: 'Senha'
+    label: 'Senha',
+    ui: {
+      base: 'bg-gray-200/50'
+    }
   }
 ])
 
@@ -41,10 +47,8 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
 <template>
   <UAuthForm
     :on-submit
-    title="Login"
     description="Entre com seu e-mail e senha."
     :submit="{ label: 'Entrar' }"
-    icon="lucide:log-in"
     :fields="fields"
     :schema
   >

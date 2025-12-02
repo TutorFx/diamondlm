@@ -57,8 +57,8 @@ const topicCards = [
         <!-- Hero Section -->
         <div class="text-center space-y-4">
           <div class="flex items-center justify-center gap-2 mb-6">
-            <UIcon name="lucide:bird" class="w-16 h-16 text-primary-500" />
-            <span class="text-6xl font-bold italic tracking-tight text-gray-900 dark:text-white">atlas.</span>
+            <img src="/icon-atlas.svg" class="h-28 block dark:hidden" />
+            <img src="/icon-atlas-branco.svg" class="h-28 hidden dark:block" />
           </div>
 
           <h2 class="text-xl text-gray-700 dark:text-gray-200">
@@ -78,7 +78,7 @@ const topicCards = [
             variant="subtle"
             color="neutral"
             size="lg"
-            class="flex items-center gap-2 px-3 py-1.5"
+            class="flex items-center gap-2 px-5 py-3 rounded-xl shadow-sm border border-gray-200 bg-white dark:bg-gray-900 dark:border-gray-800"
           >
             <UIcon :name="feature.icon" class="w-5 h-5 text-yellow-500" />
             <span>{{ feature.label }}</span>
@@ -86,7 +86,7 @@ const topicCards = [
         </div>
 
         <div class="w-full text-center mt-4">
-          <p class="text-gray-600 dark:text-gray-300 text-lg">
+          <p class="text-gray-700 dark:text-gray-300 text-sm font-medium">
             Como posso ajudar?
           </p>
         </div>
