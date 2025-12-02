@@ -171,15 +171,66 @@ onMounted(async () => {
 
       <template #footer="{ collapsed }">
         <UserMenu v-if="loggedIn" :collapsed="collapsed" />
-        <div v-else class="grid gap-4 w-full">
+        <div v-else class="grid gap-2 w-full">
+          <!-- Seção de Acesso Rápido -->
+          <div v-if="!collapsed" class="text-xs font-semibold text-muted px-2 pt-2">
+            Acesso Rápido
+          </div>
+          
           <UButton
-            :label="collapsed ? '' : 'Login with GitHub'"
-            icon="i-simple-icons-github"
+            :label="collapsed ? '' : 'Papel Timbrado'"
+            icon="i-lucide-file-text"
             color="neutral"
             variant="ghost"
-            class="w-full"
-            @click="openInPopup('/auth/github')"
+            class="w-full !justify-between"
+            trailing-icon="i-lucide-download"
+            :ui="{ trailingIcon: 'text-yellow-500 ms-auto' }"
+            to="/downloads/papel timbrado implanta.docx"
+            target="_blank"
+            download
           />
+          
+          <UButton
+            :label="collapsed ? '' : 'Template PPT'"
+            icon="i-lucide-presentation"
+            color="neutral"
+            variant="ghost"
+            class="w-full !justify-between"
+            trailing-icon="i-lucide-download"
+            :ui="{ trailingIcon: 'text-yellow-500 ms-auto' }"
+            to="/downloads/Exemplo .pptx"
+            target="_blank"
+            download
+          />
+          
+          <UButton
+            :label="collapsed ? '' : 'Plataforma Vibe'"
+            icon="i-lucide-clock"
+            color="neutral"
+            variant="ghost"
+            class="w-full !justify-between"
+            trailing-icon="i-lucide-external-link"
+            :ui="{ trailingIcon: 'text-cyan-400 ms-auto' }"
+            to="https://aliare.vibe.gp/"
+            target="_blank"
+          />
+          
+          <UButton
+            :label="collapsed ? '' : 'Plataforma Feedz'"
+            icon="i-lucide-ticket"
+            color="neutral"
+            variant="ghost"
+            class="w-full !justify-between"
+            trailing-icon="i-lucide-external-link"
+            :ui="{ trailingIcon: 'text-cyan-400 ms-auto' }"
+            to="https://app.feedz.com.br/"
+            target="_blank"
+          />
+
+          <!-- Separador -->
+          <div v-if="!collapsed" class="border-t border-neutral-200 dark:border-neutral-800 my-2"></div>
+
+          <!-- Botão de Login -->
           <ModalAuth>
             <UButton
               :label="collapsed ? '' : 'Entrar'"
