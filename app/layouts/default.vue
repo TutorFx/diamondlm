@@ -176,7 +176,7 @@ onMounted(async () => {
           <div v-if="!collapsed" class="text-xs font-semibold text-muted px-2 pt-2">
             Acesso Rápido
           </div>
-
+          
           <UButton
             :label="collapsed ? '' : 'Papel Timbrado'"
             icon="i-lucide-file-text"
@@ -189,7 +189,7 @@ onMounted(async () => {
             target="_blank"
             download
           />
-
+          
           <UButton
             :label="collapsed ? '' : 'Template PPT'"
             icon="i-lucide-presentation"
@@ -228,7 +228,7 @@ onMounted(async () => {
           />
 
           <!-- Separador -->
-          <div v-if="!collapsed" class="border-t border-neutral-200 dark:border-neutral-800 my-2" />
+          <div v-if="!collapsed" class="border-t border-neutral-200 dark:border-neutral-800 my-2"></div>
 
           <!-- Botão de Login -->
           <ModalAuth>
