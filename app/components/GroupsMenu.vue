@@ -10,6 +10,11 @@ const { groups, group } = useGroup()
 const route = useRoute()
 
 const selectedGroup = computed(() => {
+  if (route.name === 'dashboard-create-group') return {
+    name: 'Create group',
+    icon: 'i-lucide-circle-plus',
+  }
+
   const sgroup = route.params.groupSlug === 'public'
     ? {
         name: 'Public',
@@ -56,7 +61,8 @@ const items = computed<DropdownMenuItem[][]>(() => {
     }
   }], [{
     label: 'Create group',
-    icon: 'i-lucide-circle-plus'
+    icon: 'i-lucide-circle-plus',
+    to: { name: 'dashboard-create-group' }
   }, {
     label: 'Manage groups',
     icon: 'i-lucide-cog'

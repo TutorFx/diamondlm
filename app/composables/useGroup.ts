@@ -8,7 +8,7 @@ export function useGroup() {
     return groups.value?.find(g => g.slug === slug) ?? null
   })
 
-  if (route.params.groupSlug !== 'public') {
+  if (route.params?.groupSlug && route.params.groupSlug !== 'public') {
     if (!group.value?.id) throw createError({
       statusCode: 404,
       statusMessage: 'Group not found'

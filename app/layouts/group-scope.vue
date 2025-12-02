@@ -5,32 +5,36 @@ const route = useRoute()
 
 const open = ref(false)
 
-const links = computed(() => [[{
-  label: 'Home',
-  icon: 'i-lucide-house',
-  to: '/new-chat',
-  onSelect: () => {
-    open.value = false
-  }
-}, {
-  label: 'Guias',
-  icon: 'i-lucide-inbox',
-  to: {
-    name: 'dashboard-groupSlug-guide',
-    params: { groupSlug: route.params.groupSlug }
-  },
-  children: [{
-    label: 'Novo Guia',
-    icon: 'i-lucide-plus',
-    to: {
-      name: 'dashboard-groupSlug-guide-add',
-      params: { groupSlug: route.params.groupSlug }
-    },
+const links = computed(() => [[
+  {
+    label: 'Home',
+    icon: 'i-lucide-house',
+    to: '/new-chat',
     onSelect: () => {
       open.value = false
     }
-  }]
-}], []] satisfies NavigationMenuItem[][])
+  }, ...(route.params.groupSlug
+    ? [{
+        label: 'Guias',
+        icon: 'i-lucide-inbox',
+        to: {
+          name: 'dashboard-groupSlug-guide',
+          params: { groupSlug: route.params.groupSlug }
+        },
+        children: [{
+          label: 'Novo Guia',
+          icon: 'i-lucide-plus',
+          to: {
+            name: 'dashboard-groupSlug-guide-add',
+            params: { groupSlug: route.params.groupSlug }
+          },
+          onSelect: () => {
+            open.value = false
+          }
+        }]
+      }]
+    : [])
+], []] satisfies NavigationMenuItem[][])
 
 const groups = computed(() => [{
   id: 'links',
