@@ -1,6 +1,6 @@
 <template>
   <Icon
-    name="proicons:diamond"
-    class="min-w-6 min-h-6"
+    name="lucide:message-square"
+    class="min-w-5 min-h-5"
   />
 </template>

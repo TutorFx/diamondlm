@@ -82,7 +82,7 @@ const topicCards = [
           <UBadge
             v-for="feature in features"
             :key="feature.label"
-            class="bg-border text-default"
+            class="bg-elevated text-default"
 
             variant="solid"
             color="neutral"
@@ -104,7 +104,7 @@ const topicCards = [
           <UCard
             v-for="card in topicCards"
             :key="card.title"
-            class="cursor-pointer hover:ring-2 hover:ring-primary-500 transition-all group hover:scale-105"
+            class="cursor-pointer hover:ring-2 hover:ring-primary-500 transition-all group hover:scale-105 hover:bg-elevated/50"
             @click="createChat(card.prompt)"
           >
             <div class="grid grid-flow-col justify-start items-start gap-4">
@@ -115,7 +115,7 @@ const topicCards = [
                 <h3 class="font-semibold text-lg text-highlighted">
                   {{ card.title }}
                 </h3>
-                <p class="text-sm mt-1 text-muted">
+                <p class="text-sm mt-1 text-muted group-hover:text-highlighted">
                   {{ card.description }}
                 </p>
               </div>

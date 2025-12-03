@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { LazyModalConfirm } from '#components'
+import type { NavigationMenuItem } from '@nuxt/ui'
 
 const route = useRoute()
 const toast = useToast()
@@ -41,6 +42,43 @@ watch(loggedIn, () => {
 })
 
 const { groups } = useChats(chats)
+
+const footerLinks = ref<NavigationMenuItem[][]>([
+  [
+    {
+      label: 'Links',
+      type: 'label'
+    },
+    {
+      label: 'Acesso Rápido',
+      icon: 'lucide:fast-forward',
+      children: [
+        {
+          label: 'Template PPT',
+          icon: 'i-lucide-presentation',
+          to: '/downloads/Exemplo.pptx'
+        },
+        {
+          label: 'Papel Timbrado',
+          icon: 'i-lucide-file-text',
+          to: '/downloads/papel timbrado implanta.docx'
+        },
+        {
+          label: 'Plataforma Vibe',
+          icon: 'i-lucide-clock',
+          href: 'https://aliare.vibe.gp/',
+          target: '_blank'
+        },
+        {
+          label: 'Plataforma Feedz',
+          icon: 'i-lucide-ticket',
+          href: 'https://app.feedz.com.br/',
+          target: '_blank'
+        }
+      ]
+    }
+  ]
+])
 
 const items = computed(() => groups.value?.flatMap((group) => {
   return [{
@@ -119,9 +157,9 @@ onMounted(async () => {
       class="bg-elevated/50"
     >
       <template #header="{ collapsed }">
-        <NuxtLink to="/new-chat" class="flex items-end gap-0.5">
-          <Logo class="h-8 w-auto shrink-0" />
-          <span v-if="!collapsed" class="text-xl font-bold text-highlighted">Chat</span>
+        <NuxtLink to="/" class="flex items-end gap-1">
+          <Logo class="h-8 w-auto shrink-0 relative transition duration-300" :class="{ 'translate-x-1': collapsed }" />
+          <span v-if="!collapsed" class="text-xl font-bold text-highlighted">Atlas</span>
         </NuxtLink>
 
         <div v-if="!collapsed" class="flex items-center gap-1.5 ms-auto">
@@ -170,68 +208,16 @@ onMounted(async () => {
       </template>
 
       <template #footer="{ collapsed }">
-        <UserMenu v-if="loggedIn" :collapsed="collapsed" />
-        <div v-else class="grid gap-2 w-full">
-          <!-- Seção de Acesso Rápido -->
-          <div v-if="!collapsed" class="text-xs font-semibold text-muted px-2 pt-2">
-            Acesso Rápido
-          </div>
-
-          <UButton
-            :label="collapsed ? '' : 'Papel Timbrado'"
-            icon="i-lucide-file-text"
-            color="neutral"
-            variant="ghost"
-            class="w-full !justify-between"
-            trailing-icon="i-lucide-download"
-            :ui="{ trailingIcon: 'text-yellow-500 ms-auto' }"
-            to="/downloads/papel timbrado implanta.docx"
-            target="_blank"
-            download
+        <div class="grid w-full gap-3">
+          <UNavigationMenu
+            :items="footerLinks"
+            :collapsed="collapsed"
+            orientation="vertical"
+            :ui="{ link: 'overflow-hidden' }"
           />
-
-          <UButton
-            :label="collapsed ? '' : 'Template PPT'"
-            icon="i-lucide-presentation"
-            color="neutral"
-            variant="ghost"
-            class="w-full !justify-between"
-            trailing-icon="i-lucide-download"
-            :ui="{ trailingIcon: 'text-yellow-500 ms-auto' }"
-            to="/downloads/Exemplo .pptx"
-            target="_blank"
-            download
-          />
-
-          <UButton
-            :label="collapsed ? '' : 'Plataforma Vibe'"
-            icon="i-lucide-clock"
-            color="neutral"
-            variant="ghost"
-            class="w-full !justify-between"
-            trailing-icon="i-lucide-external-link"
-            :ui="{ trailingIcon: 'text-cyan-400 ms-auto' }"
-            to="https://aliare.vibe.gp/"
-            target="_blank"
-          />
-
-          <UButton
-            :label="collapsed ? '' : 'Plataforma Feedz'"
-            icon="i-lucide-ticket"
-            color="neutral"
-            variant="ghost"
-            class="w-full !justify-between"
-            trailing-icon="i-lucide-external-link"
-            :ui="{ trailingIcon: 'text-cyan-400 ms-auto' }"
-            to="https://app.feedz.com.br/"
-            target="_blank"
-          />
-
-          <!-- Separador -->
-          <div v-if="!collapsed" class="border-t border-neutral-200 dark:border-neutral-800 my-2" />
-
-          <!-- Botão de Login -->
-          <ModalAuth>
+          <USeparator />
+          <UserMenu v-if="loggedIn" :collapsed="collapsed" />
+          <ModalAuth v-else>
             <UButton
               :label="collapsed ? '' : 'Entrar'"
               icon="mdi:login"
