@@ -49,6 +49,7 @@
     "eslint": "^9.39.1",
     "modern-monaco": "^0.2.2",
     "monaco-editor": "^0.54.0",
+    "motion-v": "^1.7.4",
     "nuxt-auth-utils": "^0.5.25",
     "nuxt-monaco-editor": "^1.4.0",
     "pg": "^8.16.3",
