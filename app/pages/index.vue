@@ -9,6 +9,15 @@ async function createChat(prompt: string) {
   navigateTo(`/chat/${chat?.id}`)
 }
 
+defineShortcuts({
+  enter: {
+    usingInput: true,
+    handler: () => {
+      navigateTo(`/new-chat`)
+    }
+  }
+})
+
 const features = [
   { label: 'Respostas instantâneas', icon: 'lucide:zap' },
   { label: 'Disponível 24/7', icon: 'lucide:clock' },
@@ -51,40 +60,41 @@ const topicCards = [
     </template>
 
     <template #body>
-      <UContainer class="flex-1 flex flex-col items-center justify-center gap-8 py-12 max-w-5xl">
+      <UContainer class="flex-1 flex flex-col items-center justify-center gap-3 md:gap-8 py-12 max-w-5xl">
         <!-- Hero Section -->
         <div class="text-center space-y-4">
-          <div class="flex items-center justify-center gap-2 mb-6">
+          <div class="flex items-center justify-center gap-2 mb-2 md:mb-6">
             <img src="/icon-atlas.svg" class="h-28 block dark:hidden">
             <img src="/icon-atlas-branco.svg" class="h-28 hidden dark:block">
           </div>
 
-          <h2 class="text-xl text-gray-700 dark:text-gray-200">
+          <h2 class="text-lg md:text-xl text-accent max-sm:hidden">
             Bem-vindo ao Atlas
           </h2>
-          <p class="text-gray-500 dark:text-gray-400 text-lg">
+          <p class="text-sm md:text-lg text-muted">
             Seu assistente virtual inteligente para tudo sobre a
             empresa
           </p>
         </div>
 
         <!-- Features Row -->
-        <div class="flex flex-wrap justify-center gap-4 w-full">
+        <div class="flex flex-wrap justify-center gap-4 w-full max-sm:hidden">
           <UBadge
             v-for="feature in features"
             :key="feature.label"
-            variant="subtle"
+            class="bg-border text-default"
+
+            variant="solid"
             color="neutral"
-            size="lg"
-            class="flex items-center gap-2 px-5 py-3 rounded-xl shadow-sm border border-gray-200 bg-white dark:bg-gray-900 dark:border-gray-800"
+            size="xl"
           >
-            <UIcon :name="feature.icon" class="w-5 h-5 text-yellow-500" />
+            <UIcon :name="feature.icon" class="w-5 h-5 text-warning" />
             <span>{{ feature.label }}</span>
           </UBadge>
         </div>
 
         <div class="w-full text-center mt-4">
-          <p class="text-gray-700 dark:text-gray-300 text-sm font-medium">
+          <p class="text-accent text-sm font-medium">
             Como posso ajudar?
           </p>
         </div>
@@ -94,18 +104,18 @@ const topicCards = [
           <UCard
             v-for="card in topicCards"
             :key="card.title"
-            class="cursor-pointer hover:ring-2 hover:ring-primary-500 transition-all"
+            class="cursor-pointer hover:ring-2 hover:ring-primary-500 transition-all group hover:scale-105"
             @click="createChat(card.prompt)"
           >
-            <div class="flex items-start gap-4">
+            <div class="grid grid-flow-col justify-start items-start gap-4">
               <div class="p-3 bg-primary-100 dark:bg-primary-900/20 rounded-lg grid items-center">
                 <UIcon :name="card.icon" class="w-6 h-6 text-primary-600 dark:text-primary-400" />
               </div>
               <div>
-                <h3 class="font-semibold text-gray-900 dark:text-white text-lg">
+                <h3 class="font-semibold text-lg text-highlighted">
                   {{ card.title }}
                 </h3>
-                <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">
+                <p class="text-sm mt-1 text-muted">
                   {{ card.description }}
                 </p>
               </div>
@@ -129,12 +139,26 @@ const topicCards = [
 
         <!-- Footer -->
         <div class="mt-auto pt-8 text-center space-y-2">
-          <p class="text-gray-500 dark:text-gray-400 text-sm">
-            Ou digite sua pergunta para começar
+          <p class="text-gray-500 dark:text-gray-400 text-sm max-md:hidden">
+            <span>
+              Ou aperte
+            </span>
+
+            <UKbd size="sm">
+              Enter
+            </UKbd>
+
+            <span>
+              para começar
+            </span>
           </p>
-          <div class="flex items-center justify-center gap-2 text-xs text-gray-500 dark:text-gray-400 mt-4">
+          <div class="flex max-md:flex-wrap items-center justify-center gap-2 text-xs text-gray-500 dark:text-gray-400 mt-4">
             <UIcon name="lucide:lock" class="w-3 h-3 text-yellow-500" />
-            <span>Suas conversas são criptografadas e protegidas • Conformidade LGPD • Uptime 99%</span>
+            <span>Suas conversas são criptografadas e protegidas</span>
+            <span class="max-sm:hidden">•</span>
+            <span>Conformidade LGPD</span>
+            <span class="max-sm:hidden">•</span>
+            <span>Uptime 99%</span>
           </div>
         </div>
       </UContainer>
