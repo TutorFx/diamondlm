@@ -13,7 +13,8 @@
     "lint": "eslint .",
     "typecheck": "nuxt typecheck",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate"
+    "db:migrate": "drizzle-kit migrate",
+    "prerelease": "bun changelogen --release --prerelease"
   },
   "dependencies": {
     "@iconify-json/lucide": "^1.2.73",
