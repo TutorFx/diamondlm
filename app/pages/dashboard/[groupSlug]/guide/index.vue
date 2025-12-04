@@ -7,13 +7,15 @@ definePageMeta({
 })
 
 const tabItems = [{
-  label: 'Todos',
-  value: 'all'
+  label: 'Ver',
+  value: 'view'
 }, {
-  label: 'Não Processados',
-  value: 'unread'
+  label: 'Editar',
+  value: 'edit'
 }]
-const selectedTab = ref('all')
+
+const selectedTab = ref('view')
+const editing = computed(() => selectedTab.value === 'edit')
 
 const { group } = useGroup()
 
@@ -67,7 +69,12 @@ const isMobile = breakpoints.smaller('lg')
     <GuideList v-model="selectedGuide" :guides="guides" />
   </UDashboardPanel>
 
-  <Guide v-if="selectedGuide" :guide-id="selectedGuide" @close="selectedGuide = null" />
+  <Guide
+    v-if="selectedGuide"
+    :guide-id="selectedGuide"
+    :editing
+    @close="selectedGuide = null"
+  />
   <div v-else class="hidden lg:flex flex-1 items-center justify-center">
     <UIcon name="i-lucide-inbox" class="size-32 text-dimmed" />
   </div>
@@ -75,7 +82,12 @@ const isMobile = breakpoints.smaller('lg')
   <ClientOnly>
     <USlideover v-if="isMobile" v-model:open="isGuidePanelOpen">
       <template #content>
-        <Guide v-if="selectedGuide" :guide-id="selectedGuide" @close="selectedGuide = null" />
+        <Guide
+          v-if="selectedGuide"
+          :guide-id="selectedGuide"
+          :editing
+          @close="selectedGuide = null"
+        />
       </template>
     </USlideover>
   </ClientOnly>

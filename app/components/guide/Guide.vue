@@ -4,6 +4,7 @@ import { LazyModalConfirm } from '#components'
 
 const props = defineProps<{
   guideId: number
+  editing: boolean
 }>()
 
 const emits = defineEmits(['close'])
@@ -97,7 +98,7 @@ function updateGuide() {
       </template>
 
       <template #right>
-        <UTooltip text="Salvar">
+        <UTooltip v-if="editing" text="Salvar">
           <UButton
             icon="i-lucide-save"
             color="neutral"
@@ -116,7 +117,7 @@ function updateGuide() {
       </template>
     </UDashboardNavbar>
 
-    <div class="grid">
+    <div v-if="editing" class="grid">
       <MonacoEditor
         v-model="update"
         :options="{
@@ -125,6 +126,14 @@ function updateGuide() {
             ? 'vs-dark' : 'vs-light'
         }"
         lang="markdown"
+      />
+    </div>
+    <div v-else class="relative overflow-x-auto py-8 px-7">
+      <MDCCached
+        :value="update"
+        :cache-key="`${guide!.id}`"
+        :parser-options="{ highlight: false }"
+        class="*:first:mt-0 *:last:mb-0"
       />
     </div>
   </UDashboardPanel>
