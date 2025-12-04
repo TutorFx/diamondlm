@@ -41,6 +41,7 @@
     "ai-sdk-ollama": "^0.13.0",
     "argon2": "^0.44.0",
     "bullmq": "^5.63.2",
+    "changelogen": "^0.6.2",
     "clsx": "^2.1.1",
     "culori": "^4.0.2",
     "date-fns": "^4.1.0",
