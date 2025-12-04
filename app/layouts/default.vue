@@ -212,6 +212,8 @@ onMounted(async () => {
           <UNavigationMenu
             :items="footerLinks"
             :collapsed="collapsed"
+            tooltip
+            popover
             orientation="vertical"
             :ui="{ link: 'overflow-hidden' }"
           />

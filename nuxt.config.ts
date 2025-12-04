@@ -5,7 +5,8 @@ export default defineNuxtConfig({
     '@nuxt/ui',
     '@nuxtjs/mdc',
     'nuxt-auth-utils',
-    'nuxt-monaco-editor'
+    'nuxt-monaco-editor',
+    'motion-v/nuxt'
   ],
 
   devtools: {
