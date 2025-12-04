@@ -108,12 +108,6 @@ export default defineEventHandler(async (event) => {
     <formatting_protocol_instruction>
       Use Markdown padrão para estruturação (h2, h3, bullet points)
     </formatting_protocol_instruction>
-    <formatting_protocol_instruction>
-      Para código, especifique sempre a linguagem
-    </formatting_protocol_instruction>
-    <formatting_protocol_instruction>
-      Se o usuário pedir um formato específico (JSON, XML, CSV), a saída deve ser APENAS o dado bruto, sem texto introdutório ou conclusivo
-    </formatting_protocol_instruction>
   </formatting_protocol>
 </system_configuration>
 `,
