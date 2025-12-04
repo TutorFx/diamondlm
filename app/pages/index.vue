@@ -1,4 +1,8 @@
 <script setup lang="ts">
+definePageMeta({
+  middleware: ['authed']
+})
+
 async function createChat(prompt: string) {
   const chat = await $fetch('/api/chats', {
     method: 'POST',

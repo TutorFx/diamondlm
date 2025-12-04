@@ -9,6 +9,9 @@ export interface LoginSlots {
 
 <script setup lang="ts">
 const slots = defineSlots<LoginSlots>()
+const emits = defineEmits<{
+  (e: 'submit', payload: FormSubmitEvent<z.infer<typeof schema>>): void
+}>()
 
 const { fetch: fetchUserSession } = useUserSession()
 const { handler } = useRequestErrorHandler.asToast()
@@ -40,7 +43,10 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
   return await $fetch('/auth/token/login', {
     method: 'POST',
     body: payload.data
-  }).then(fetchUserSession).catch(handler)
+  }).then(async () => {
+    await fetchUserSession()
+    emits('submit', payload)
+  }).catch(handler)
 }
 </script>
 

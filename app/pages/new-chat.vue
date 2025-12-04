@@ -1,4 +1,8 @@
 <script setup lang="ts">
+definePageMeta({
+  middleware: ['authed']
+})
+
 const input = ref('')
 const loading = ref(false)
 
@@ -71,17 +75,35 @@ const quickChats = [
         </UChatPrompt>
 
         <div class="flex flex-wrap gap-2">
-          <UButton
-            v-for="quickChat in quickChats"
+          <Motion
+            v-for="(quickChat, index) in quickChats"
             :key="quickChat.label"
-            :icon="quickChat.icon"
-            :label="quickChat.label"
-            size="sm"
-            color="neutral"
-            variant="outline"
-            class="rounded-full"
-            @click="createChat(quickChat.label)"
-          />
+
+            :initial="{
+              scale: 1.1,
+              opacity: 0,
+              filter: 'blur(20px)'
+            }"
+            :animate="{
+              scale: 1,
+              opacity: 1,
+              filter: 'blur(0px)'
+            }"
+            :transition="{
+              duration: 0.6,
+              delay: 0.1 + index * 0.1
+            }"
+          >
+            <UButton
+              :icon="quickChat.icon"
+              :label="quickChat.label"
+              size="sm"
+              color="neutral"
+              variant="outline"
+              class="rounded-full"
+              @click="createChat(quickChat.label)"
+            />
+          </Motion>
         </div>
       </UContainer>
     </template>
