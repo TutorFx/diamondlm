@@ -64,7 +64,7 @@ const topicCards = [
     </template>
 
     <template #body>
-      <UContainer class="flex-1 flex flex-col items-center justify-center gap-3 md:gap-8 py-12 max-w-5xl">
+      <UContainer class="flex-1 flex flex-col items-center justify-center gap-3 md:gap-8 py-12 max-w-5xl overflow-x-hidden">
         <!-- Hero Section -->
         <div class="text-center space-y-4">
           <Motion
