@@ -29,7 +29,7 @@ const isGuidePanelOpen = computed({
 })
 
 const allowedToEdit = computed(() => {
-  if (!group.value) return false
+  if (!group.value) return true // Global guides can be edited by anyone (for now)
 
   return group.value.permissions.includes(PERMISSIONS.GUIDE.UPDATE)
 })
