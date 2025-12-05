@@ -8,6 +8,10 @@ defineProps<{
 const colorMode = useColorMode()
 const { user, clear } = useUserSession()
 
+onNuxtReady(() => {
+  refreshNuxtData('last-group')
+})
+
 const { data } = useNuxtData<{ slug: string }>('last-group')
 
 const items = computed<DropdownMenuItem[][]>(() => ([[{
@@ -17,20 +21,20 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
     src: user.value?.avatar || undefined,
     alt: user.value?.name || undefined
   }
-}], [
-  ...data.value
-    ? [{
-        label: 'Painel de controle',
-        icon: 'lucide:layout-dashboard',
-        to: {
-          name: 'dashboard-groupSlug-guide',
-          params: {
-            groupSlug: data.value.slug
-          }
+}],
+...data.value
+  ? [[{
+      label: 'Painel de controle',
+      icon: 'lucide:layout-dashboard',
+      to: {
+        name: 'dashboard-groupSlug-guide',
+        params: {
+          groupSlug: data.value.slug
         }
-      }]
-    : []
-], [{
+      }
+    }]]
+  : [],
+[{
   label: 'Aparência',
   icon: 'i-lucide-sun-moon',
   children: [{
