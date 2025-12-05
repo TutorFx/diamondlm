@@ -1,6 +1,24 @@
 # Changelog
 
 
+## v0.0.1-2
+
+[compare changes](https://github.com/TutorFx/diamondlm/compare/v0.0.1-1...v0.0.1-2)
+
+### 🩹 Fixes
+
+- Refresh last group data on user menu and group access middleware ([03018d4](https://github.com/TutorFx/diamondlm/commit/03018d4))
+- Ensure immediate execution of last group data fetching in group access middleware ([93e655a](https://github.com/TutorFx/diamondlm/commit/93e655a))
+- Add overflow-x-hidden to UContainer for better layout handling ([df1b288](https://github.com/TutorFx/diamondlm/commit/df1b288))
+
+### 🏡 Chore
+
+- **release:** V0.0.1-1 ([c045c4c](https://github.com/TutorFx/diamondlm/commit/c045c4c))
+
+### ❤️ Contributors
+
+- Gabriel Serejo <gabriel_serejo@live.com>
+
 ## v0.0.1-1
 
 [compare changes](https://github.com/TutorFx/diamondlm/compare/v0.0.1-0...v0.0.1-1)
