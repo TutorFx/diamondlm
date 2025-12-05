@@ -1,3 +1,5 @@
+import type { User } from '#auth-utils'
+
 export default defineEventHandler(async (event) => {
   const body = await readValidatedBody(event, loginSchema.safeParse)
   const session = await getUserSession(event)
@@ -25,7 +27,14 @@ export default defineEventHandler(async (event) => {
   }).where(eq(tables.chats.userId, session.id))
 
   await setUserSession(event, {
-    user,
+    user: {
+      name: user.name,
+      email: user.email,
+      id: user.id,
+      avatar: user.avatar,
+      provider: 'token',
+      providerId: null
+    } satisfies User,
     loggedInAt: new Date()
   })
 
