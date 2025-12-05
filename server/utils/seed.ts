@@ -9,7 +9,7 @@ async function processGuide(db: ReturnType<typeof useDrizzle>, filePath: string,
   const content = fs.readFileSync(filePath, 'utf-8')
   const title = path.basename(filePath, '.md')
     .replace(/-/g, ' ')
-    .replace(/\b\w/g, l => l.toUpperCase()) // Title Case
+    .replace(/\b\w/g, l => l.toUpperCase())
 
   logger.info(`[SEED] Processando o guia: ${title}...`)
 
@@ -51,6 +51,8 @@ async function runSeed() {
   logger.info('[SEED] Iniciando o processo de seed...')
 
   const db = useDrizzle()
+
+  logger.info(`[SEED] Limpando redis...`)
 
   logger.info('[SEED] Limpando tabelas existentes...')
   await db.delete(tables.groupMembers)

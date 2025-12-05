@@ -7,8 +7,8 @@ const open = ref(false)
 
 const links = computed(() => [[
   {
-    label: 'Home',
-    icon: 'i-lucide-house',
+    label: 'Chat',
+    icon: 'lucide:message-square',
     to: '/new-chat',
     onSelect: () => {
       open.value = false

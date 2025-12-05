@@ -6,14 +6,6 @@ definePageMeta({
   middleware: 'validate-group-access'
 })
 
-const tabItems = [{
-  label: 'Ver',
-  value: 'view'
-}, {
-  label: 'Editar',
-  value: 'edit'
-}]
-
 const selectedTab = ref('view')
 const editing = computed(() => selectedTab.value === 'edit')
 
@@ -35,6 +27,27 @@ const isGuidePanelOpen = computed({
     }
   }
 })
+
+const allowedToEdit = computed(() => {
+  if (!group.value) return false
+
+  return group.value.permissions.includes(PERMISSIONS.GUIDE.UPDATE)
+})
+
+watch(allowedToEdit, (newValue) => {
+  if (!newValue) return
+
+  selectedTab.value = 'view'
+})
+
+const tabItems = computed(() => ([{
+  label: 'Ver',
+  value: 'view'
+}, {
+  label: 'Editar',
+  value: 'edit',
+  disabled: !allowedToEdit.value
+}]))
 
 const breakpoints = useBreakpoints(breakpointsTailwind)
 const isMobile = breakpoints.smaller('lg')

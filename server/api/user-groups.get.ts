@@ -2,7 +2,9 @@ export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
   const db = useDrizzle()
 
-  if (!session.user?.id) {
+  const userId = session.user?.id || session.id
+
+  if (!userId) {
     return createError({
       message: 'Not authenticated',
       statusCode: 401
@@ -19,5 +21,5 @@ export default defineEventHandler(async (event) => {
     })
     .from(tables.groupMembers)
     .innerJoin(tables.groups, eq(tables.groupMembers.groupId, tables.groups.id))
-    .where(eq(tables.groupMembers.userId, session.user.id))
+    .where(eq(tables.groupMembers.userId, userId))
 })

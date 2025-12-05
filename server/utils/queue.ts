@@ -1,21 +1,6 @@
 import { Queue, Worker } from 'bullmq'
-import IORedis from 'ioredis'
 import { useDrizzle, tables, eq } from './drizzle'
 import { useEmbedding } from './embedding'
-
-let redis: null | IORedis
-
-export function useRedis() {
-  if (!redis) {
-    redis = new IORedis({
-      host: process.env.REDIS_HOST || 'localhost',
-      port: Number(process.env.REDIS_PORT) || 6379,
-      password: process.env.REDIS_PASSWORD,
-      maxRetriesPerRequest: null
-    })
-  }
-  return redis
-}
 
 export const EMBEDDING_QUEUE_NAME = 'embedding-generation'
 
