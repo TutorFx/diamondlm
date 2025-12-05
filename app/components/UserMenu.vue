@@ -8,7 +8,7 @@ defineProps<{
 const colorMode = useColorMode()
 const { user, clear } = useUserSession()
 
-onNuxtReady(() => {
+onBeforeMount(() => {
   refreshNuxtData('last-group')
 })
 

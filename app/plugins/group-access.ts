@@ -1,7 +1,7 @@
 export default defineNuxtPlugin(() => {
   const headers = useRequestHeaders(['cookie'])
 
-  const { refresh: refreshLastGroup } = useAsyncData('last-group', (_nuxtApp, { signal }) => $fetch<{ slug: string }>('/api/user/last-group', { cache: 'no-store', signal, headers }))
+  const { refresh: refreshLastGroup } = useAsyncData('last-group', (_nuxtApp, { signal }) => $fetch<{ slug: string }>('/api/user/last-group', { cache: 'no-store', signal, headers }), { immediate: false })
 
   addRouteMiddleware('validate-group-access', async (to, from) => {
     if (import.meta.prerender) {
