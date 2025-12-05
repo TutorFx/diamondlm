@@ -5,7 +5,9 @@ export default defineNitroPlugin(async (nitroApp) => {
     return
   }
 
-  console.log('[Plugin] Inicializando Worker do BullMQ...')
+  const log = logger.withTag('BullMQ-Plugin')
+
+  log.log('Inicializando Worker do BullMQ...')
 
   const worker = createEmbeddingWorker()
 
@@ -15,7 +17,7 @@ export default defineNitroPlugin(async (nitroApp) => {
   const chunksWithoutEmbedding = await db.select().from(tables.chunk).where(isNull(tables.chunk.embedding))
 
   if (chunksWithoutEmbedding.length > 0) {
-    console.log(`[Plugin] Encontrados ${chunksWithoutEmbedding.length} chunks sem embedding. Adicionando na fila...`)
+    log.log(`Encontrados ${chunksWithoutEmbedding.length} chunks sem embedding. Adicionando na fila...`)
 
     const jobs = chunksWithoutEmbedding.map(chunk => ({
       name: 'generate',
@@ -31,7 +33,7 @@ export default defineNitroPlugin(async (nitroApp) => {
   }
 
   nitroApp.hooks.hook('close', async () => {
-    console.log('[Plugin] Fechando Worker do BullMQ...')
+    log.log('Fechando Worker do BullMQ...')
     await worker.close()
   })
 })

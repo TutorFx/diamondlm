@@ -10,9 +10,10 @@ export function useEmbeddingQueue() {
 }
 
 export function createEmbeddingWorker() {
+  const log = logger.withTag('BullMQ-Queue')
   const connection = useRedis()
   const worker = new Worker(EMBEDDING_QUEUE_NAME, async (job) => {
-    console.log(`[BullMQ] Processando chunk ID: ${job.data.chunkId}`)
+    log.log(`Processando chunk ID: ${job.data.chunkId}`)
 
     const db = useDrizzle()
     const { generateEmbedding } = useEmbedding()
@@ -27,7 +28,7 @@ export function createEmbeddingWorker() {
       .where(eq(tables.chunk.id, job.data.chunkId))
 
     if (!chunkData) {
-      console.warn(`[BullMQ] Chunk ${job.data.chunkId} não encontrado.`)
+      log.warn(`Chunk ${job.data.chunkId} não encontrado.`)
       return
     }
 
@@ -44,7 +45,7 @@ export function createEmbeddingWorker() {
       })
       .where(eq(tables.chunk.id, job.data.chunkId))
 
-    console.log(`[BullMQ] Chunk ${job.data.chunkId} finalizado.`)
+    log.log(`Chunk ${job.data.chunkId} finalizado.`)
     return { success: true }
   }, {
     connection,

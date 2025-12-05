@@ -2,16 +2,18 @@ import { textSplitter } from './langchain'
 import { useDrizzle, tables } from './drizzle'
 import { PERMISSIONS } from '../../shared/utils/permissions'
 import { logger } from '../../shared/utils/logger'
+import { useRedis } from './redis'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
 
 async function processGuide(db: ReturnType<typeof useDrizzle>, filePath: string, groupId: string | null) {
+  const log = logger.withTag('SEED:ProcessGuide')
   const content = fs.readFileSync(filePath, 'utf-8')
   const title = path.basename(filePath, '.md')
     .replace(/-/g, ' ')
     .replace(/\b\w/g, l => l.toUpperCase())
 
-  logger.info(`[SEED] Processando o guia: ${title}...`)
+  log.log(`Processando o guia: ${title}...`)
 
   const [newGuide] = await db
     .insert(tables.guides)
@@ -25,15 +27,15 @@ async function processGuide(db: ReturnType<typeof useDrizzle>, filePath: string,
   if (!newGuide) throw new Error('Failed to create guide')
 
   const guideId = newGuide.insertedId
-  logger.info(`[SEED] Guia "${title}" criado com ID: ${guideId}.`)
+  log.log(`Guia "${title}" criado com ID: ${guideId}.`)
 
   const chunks = await textSplitter.createDocuments([content])
   if (chunks.length === 0) {
-    logger.info(`[SEED] Nenhum chunk gerado para o guia "${title}". Pulando.`)
+    log.log(`Nenhum chunk gerado para o guia "${title}". Pulando.`)
     return
   }
 
-  logger.info(`[SEED] Gerando ${chunks.length} embeddings para os chunks...`)
+  log.log(`Gerando ${chunks.length} embeddings para os chunks...`)
 
   const chunksData = chunks.map((chunk) => {
     return {
@@ -43,18 +45,23 @@ async function processGuide(db: ReturnType<typeof useDrizzle>, filePath: string,
     }
   })
 
-  logger.info(`[SEED] Inserindo ${chunksData.length} chunks no banco de dados...`)
+  log.log(`Inserindo ${chunksData.length} chunks no banco de dados...`)
   await db.insert(tables.chunk).values(chunksData)
 }
 
 async function runSeed() {
-  logger.info('[SEED] Iniciando o processo de seed...')
+  const log = logger.withTag('SEED')
+
+  log.log('Iniciando o processo de seed...')
 
   const db = useDrizzle()
+  const kv = useRedis()
 
-  logger.info(`[SEED] Limpando redis...`)
+  log.log(`Limpando redis...`)
+  await kv.flushdb('ASYNC')
+  await kv.quit()
 
-  logger.info('[SEED] Limpando tabelas existentes...')
+  log.log('Limpando tabelas existentes...')
   await db.delete(tables.groupMembers)
   await db.delete(tables.groups)
   await db.delete(tables.users)
@@ -62,7 +69,7 @@ async function runSeed() {
   await db.delete(tables.guides)
 
   // Criar Usuário Admin
-  logger.info('[SEED] Criando usuário admin...')
+  log.log('Criando usuário admin...')
   const [user] = await db
     .insert(tables.users)
     .values({
@@ -74,12 +81,12 @@ async function runSeed() {
     .returning()
 
   if (!user) throw new Error('Failed to create user')
-  logger.info(`[SEED] Usuário criado: ${user.name} (ID: ${user.id})`)
+  log.log(`Usuário criado: ${user.name} (ID: ${user.id})`)
 
   const seedDir = path.resolve('./seed')
 
   if (!fs.existsSync(seedDir)) {
-    logger.info('[SEED] Diretório seed não encontrado.')
+    log.log('Diretório seed não encontrado.')
     return { result: 'Skipped' }
   }
 
@@ -93,12 +100,12 @@ async function runSeed() {
     const files = fs.readdirSync(dirPath).filter(f => f.endsWith('.md'))
 
     if (dirName === 'public') {
-      logger.info('[SEED] Processando pasta public (guias globais)...')
+      log.log('Processando pasta public (guias globais)...')
       for (const file of files) {
         await processGuide(db, path.join(dirPath, file), null)
       }
     } else {
-      logger.info(`[SEED] Processando grupo: ${dirName}...`)
+      log.log(`Processando grupo: ${dirName}...`)
 
       // Criar Grupo
       const [group] = await db
@@ -110,11 +117,11 @@ async function runSeed() {
         .returning()
 
       if (!group) {
-        logger.error(`[SEED] Falha ao criar grupo ${dirName}`)
+        log.error(`Falha ao criar grupo ${dirName}`)
         continue
       }
 
-      logger.info(`[SEED] Grupo criado: ${group.name} (ID: ${group.id})`)
+      log.log(`Grupo criado: ${group.name} (ID: ${group.id})`)
 
       // Adicionar Admin ao Grupo
       await db.insert(tables.groupMembers).values({
@@ -128,7 +135,7 @@ async function runSeed() {
           PERMISSIONS.GROUP.READ
         ]
       })
-      logger.info(`[SEED] Admin adicionado ao grupo ${group.name}`)
+      log.log(`Admin adicionado ao grupo ${group.name}`)
 
       // Processar guias do grupo
       for (const file of files) {
@@ -137,7 +144,7 @@ async function runSeed() {
     }
   }
 
-  logger.info('[SEED] Processo de seed concluído com sucesso!')
+  log.log('Processo de seed concluído com sucesso!')
   return { result: 'Success' }
 }
 
