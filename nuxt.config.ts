@@ -34,14 +34,6 @@ export default defineNuxtConfig({
     }
   },
 
-  vite: {
-    build: {
-      rollupOptions: {
-        external: ['culori']
-      }
-    }
-  },
-
   eslint: {
     config: {
       stylistic: {
