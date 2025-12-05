@@ -1,6 +1,23 @@
 # Changelog
 
 
+## v0.0.1-1
+
+[compare changes](https://github.com/TutorFx/diamondlm/compare/v0.0.1-0...v0.0.1-1)
+
+### 🚀 Enhancements
+
+- Add prerelease script for changelogen in package.json ([eb78df0](https://github.com/TutorFx/diamondlm/commit/eb78df0))
+- Enhance seed process with logging and dynamic guide processing ([6d32457](https://github.com/TutorFx/diamondlm/commit/6d32457))
+- Enable editing mode in Guide component and update tab items ([416cd7d](https://github.com/TutorFx/diamondlm/commit/416cd7d))
+- Implement last group retrieval and update user session handling ([61ddc90](https://github.com/TutorFx/diamondlm/commit/61ddc90))
+- Allow editing of global guides regardless of group access ([c66c01d](https://github.com/TutorFx/diamondlm/commit/c66c01d))
+- Replace console logs with logger in worker, queue, and seed processes ([8a74851](https://github.com/TutorFx/diamondlm/commit/8a74851))
+
+### ❤️ Contributors
+
+- Gabriel Serejo <gabriel_serejo@live.com>
+
 ## v0.0.1-0
 
 
