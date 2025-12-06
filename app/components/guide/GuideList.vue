@@ -58,11 +58,13 @@ defineShortcuts({
         ]"
         @click="selectedGuide = guide.id"
       >
-        <div class="flex items-center justify-between" :class="[isAfter(new Date(guide.updatedAt), new Date(guide.createdAt)) && 'font-semibold']">
-          <div class="flex items-center gap-3">
-            {{ guide.title }}
+        <div class="grid grid-cols-[1fr_max-content] items-center justify-between gap-3" :class="[isAfter(new Date(guide.updatedAt), new Date(guide.createdAt)) && 'font-semibold']">
+          <div class="flex items-center gap-3 truncate">
+            <span class="truncate">
+              {{ guide.title }}
+            </span>
 
-            <UChip v-if="isAfter(new Date(guide.createdAt), new Date(guide.updatedAt))" />
+            <UChip v-if="false && isAfter(new Date(guide.createdAt), new Date(guide.updatedAt))" />
           </div>
 
           <span>{{ isToday(new Date(guide.createdAt)) ? format(new Date(guide.createdAt), 'HH:mm') : format(new Date(guide.createdAt), 'dd MMM') }}</span>
