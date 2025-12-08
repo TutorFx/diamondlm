@@ -64,7 +64,7 @@ const topicCards = [
     </template>
 
     <template #body>
-      <UContainer class="flex-1 flex flex-col items-center justify-center gap-3 md:gap-8 py-12 max-w-5xl overflow-x-hidden">
+      <UContainer class="grid items-center justify-center gap-3 md:gap-8 py-12 max-w-5xl">
         <!-- Hero Section -->
         <div class="text-center space-y-4">
           <Motion
@@ -215,7 +215,7 @@ const topicCards = [
               class="cursor-pointer hover:ring-2 hover:ring-primary-500 transition-all group hover:scale-105 hover:bg-elevated/50"
               @click="createChat(card.prompt)"
             >
-              <div class="grid grid-flow-col justify-start items-start gap-4">
+              <div class="grid grid-flow-col justify-start items-start gap-4 group-hover:scale-102 transition-all duration-300 transform-gpu">
                 <div class="p-3 bg-primary-100 dark:bg-primary-900/20 rounded-lg grid items-center">
                   <UIcon :name="card.icon" class="w-6 h-6 text-primary-600 dark:text-primary-400" />
                 </div>
