@@ -38,10 +38,21 @@ const links = computed(() => [[
         ? [{
             icon: 'i-lucide-cog',
             label: 'Gerenciar',
-            to: {
-              name: 'dashboard-groupSlug-manage',
-              params: { groupSlug: route.params.groupSlug }
-            }
+            children: [{
+              label: 'Membros',
+              icon: 'i-lucide-users',
+              to: {
+                name: 'dashboard-groupSlug-manage-member',
+                params: { groupSlug: route.params.groupSlug }
+              }
+            }, {
+              label: 'Configurações',
+              icon: 'i-lucide-cog',
+              to: {
+                name: 'dashboard-groupSlug-manage-settings',
+                params: { groupSlug: route.params.groupSlug }
+              }
+            }]
           }]
         : [])
       ]

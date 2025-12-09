@@ -1,6 +1,6 @@
 <script setup lang="ts">
 definePageMeta({
-  layout: 'group-manage',
+  layout: 'group-scope',
   middleware: 'validate-group-access'
 })
 </script>

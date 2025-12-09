@@ -5,7 +5,7 @@ import type { CellContext } from '@tanstack/vue-table'
 import type { GroupPermissions, GroupPermissionMap } from '~~/shared/types/permissions'
 
 definePageMeta({
-  layout: 'group-manage',
+  layout: 'group-scope',
   middleware: 'validate-group-access'
 })
 
