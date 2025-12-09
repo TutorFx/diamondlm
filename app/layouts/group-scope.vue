@@ -5,6 +5,8 @@ const route = useRoute()
 
 const open = ref(false)
 
+const { group } = useGroup()
+
 const links = computed(() => [[
   {
     label: 'Chat',
@@ -32,7 +34,17 @@ const links = computed(() => [[
             open.value = false
           }
         }]
-      }]
+      }, ...(group.value?.permissions.includes(PERMISSIONS.GROUP.MANAGE_MEMBERS)
+        ? [{
+            icon: 'i-lucide-cog',
+            label: 'Gerenciar',
+            to: {
+              name: 'dashboard-groupSlug-manage',
+              params: { groupSlug: route.params.groupSlug }
+            }
+          }]
+        : [])
+      ]
     : [])
 ], []] satisfies NavigationMenuItem[][])
 

@@ -63,9 +63,6 @@ const items = computed<DropdownMenuItem[][]>(() => {
     label: 'Create group',
     icon: 'i-lucide-circle-plus',
     to: { name: 'dashboard-create-group' }
-  }, {
-    label: 'Manage groups',
-    icon: 'i-lucide-cog'
   }]]
 })
 </script>
