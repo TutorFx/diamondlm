@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
 
   const items = await db
     .select({
-      id: tables.groups.id,
+      id: tables.groupMembers.userId,
       name: tables.users.name,
       permissions: tables.groupMembers.permissions
     })

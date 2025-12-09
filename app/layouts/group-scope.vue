@@ -18,14 +18,14 @@ const links = computed(() => [[
   }, ...(route.params.groupSlug
     ? [{
         label: 'Guias',
-        icon: 'i-lucide-inbox',
+        icon: 'lucide:inbox',
         to: {
           name: 'dashboard-groupSlug-guide',
           params: { groupSlug: route.params.groupSlug }
         },
         children: [{
           label: 'Novo Guia',
-          icon: 'i-lucide-plus',
+          icon: 'lucide:plus',
           to: {
             name: 'dashboard-groupSlug-guide-add',
             params: { groupSlug: route.params.groupSlug }
