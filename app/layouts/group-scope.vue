@@ -5,6 +5,8 @@ const route = useRoute()
 
 const open = ref(false)
 
+const { group } = useGroup()
+
 const links = computed(() => [[
   {
     label: 'Chat',
@@ -16,14 +18,14 @@ const links = computed(() => [[
   }, ...(route.params.groupSlug
     ? [{
         label: 'Guias',
-        icon: 'i-lucide-inbox',
+        icon: 'lucide:inbox',
         to: {
           name: 'dashboard-groupSlug-guide',
           params: { groupSlug: route.params.groupSlug }
         },
         children: [{
           label: 'Novo Guia',
-          icon: 'i-lucide-plus',
+          icon: 'lucide:plus',
           to: {
             name: 'dashboard-groupSlug-guide-add',
             params: { groupSlug: route.params.groupSlug }
@@ -32,7 +34,28 @@ const links = computed(() => [[
             open.value = false
           }
         }]
-      }]
+      }, ...(group.value?.permissions.includes(PERMISSIONS.GROUP.MANAGE_MEMBERS)
+        ? [{
+            icon: 'i-lucide-cog',
+            label: 'Gerenciar',
+            children: [{
+              label: 'Membros',
+              icon: 'i-lucide-users',
+              to: {
+                name: 'dashboard-groupSlug-manage-member',
+                params: { groupSlug: route.params.groupSlug }
+              }
+            }, {
+              label: 'Configurações',
+              icon: 'i-lucide-cog',
+              to: {
+                name: 'dashboard-groupSlug-manage-settings',
+                params: { groupSlug: route.params.groupSlug }
+              }
+            }]
+          }]
+        : [])
+      ]
     : [])
 ], []] satisfies NavigationMenuItem[][])
 
