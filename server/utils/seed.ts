@@ -83,6 +83,22 @@ async function runSeed() {
   if (!user) throw new Error('Failed to create user')
   log.log(`Usuário criado: ${user.name} (ID: ${user.id})`)
 
+  // Criar Usuário sem grupo
+  log.log('Criando usuário sem grupo...')
+  const [userNoGroup] = await db
+    .insert(tables.users)
+    .values({
+      name: 'User No Group',
+      email: 'user@nogroup.com',
+      provider: 'token',
+      password: '$argon2id$v=19$m=65536,t=3,p=4$Tr/J52XFebvotDC2SFXzlg$orHFwV6tDtCv0nt55U5ZMefO7DiXIwp1gu7+Bg+MdHA'
+    })
+    .returning()
+
+  if (userNoGroup) {
+    log.log(`Usuário sem grupo criado: ${userNoGroup.name} (ID: ${userNoGroup.id})`)
+  }
+
   const seedDir = path.resolve('./seed')
 
   if (!fs.existsSync(seedDir)) {
@@ -132,7 +148,8 @@ async function runSeed() {
           PERMISSIONS.GUIDE.UPDATE,
           PERMISSIONS.GUIDE.DELETE,
           PERMISSIONS.GUIDE.CREATE,
-          PERMISSIONS.GROUP.READ
+          PERMISSIONS.GROUP.READ,
+          PERMISSIONS.GROUP.MANAGE_MEMBERS
         ]
       })
       log.log(`Admin adicionado ao grupo ${group.name}`)

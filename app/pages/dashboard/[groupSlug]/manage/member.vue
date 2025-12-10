@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { UIcon, UTooltip, UCheckbox, UButton } from '#components'
+import { UIcon, UTooltip, UCheckbox, UButton, USlideover, UForm, UInput } from '#components'
+import { z } from 'zod'
 import type { TableColumn } from '@nuxt/ui'
 import type { CellContext } from '@tanstack/vue-table'
 import type { GroupPermissions, GroupPermissionMap } from '~~/shared/types/permissions'
@@ -133,11 +134,98 @@ const columns: TableColumn<PermissionData>[] = [
     }
   }))
 ]
+
+const isAddMemberOpen = ref(false)
+const isAddingMember = ref(false)
+const addMemberState = reactive({
+  email: ''
+})
+
+const addMemberSchema = z.object({
+  email: z.email('Email inválido')
+})
+
+async function addMember() {
+  isAddingMember.value = true
+  try {
+    await $fetch(`/api/group/${group.value!.id}/manage/members`, {
+      method: 'POST',
+      headers,
+      body: { email: addMemberState.email }
+    })
+
+    toast.add({ title: 'Membro adicionado com sucesso', color: 'success' })
+    isAddMemberOpen.value = false
+    addMemberState.email = ''
+    await refresh()
+  } catch (err: unknown) {
+    console.error(err)
+    const error = err as { data?: { message?: string } }
+    toast.add({
+      title: 'Erro ao adicionar membro',
+      description: error.data?.message || 'Ocorreu um erro',
+      color: 'error'
+    })
+  } finally {
+    isAddingMember.value = false
+  }
+}
 </script>
 
 <template>
   <UDashboardPanel class="grid grid-rows-[max-content_1fr] px-0">
     <UDashboardNavbar title="Gerenciar Membros">
+      <template #left>
+        <USlideover title="Adicionar Membro">
+          <UButton
+            icon="lucide:user-plus"
+            label="Adicionar Membro"
+            variant="ghost"
+            color="neutral"
+          />
+          <template #content="{ close }">
+            <div class="p-4 flex flex-col gap-4 h-full">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold">
+                  Adicionar Membro
+                </h3>
+                <UButton
+                  icon="lucide:x"
+                  color="neutral"
+                  variant="ghost"
+                  @click="close()"
+                />
+              </div>
+
+              <UForm
+                :schema="addMemberSchema"
+                :state="addMemberState"
+                class="flex flex-col gap-4"
+                @submit="addMember"
+              >
+                <UFormGroup label="Email do usuário" name="email">
+                  <UInput v-model="addMemberState.email" placeholder="exemplo@email.com" autofocus />
+                </UFormGroup>
+
+                <div class="flex justify-end gap-2 mt-4">
+                  <UButton
+                    label="Cancelar"
+                    color="neutral"
+                    variant="ghost"
+                    @click="isAddMemberOpen = false"
+                  />
+                  <UButton
+                    type="submit"
+                    label="Adicionar"
+                    color="primary"
+                    :loading="isAddingMember"
+                  />
+                </div>
+              </UForm>
+            </div>
+          </template>
+        </USlideover>
+      </template>
       <template #right>
         <UButton
           v-if="hasChanges"
@@ -161,4 +249,3 @@ const columns: TableColumn<PermissionData>[] = [
     <UTable :columns :data="rows" />
   </UDashboardPanel>
 </template>
-```

@@ -27,10 +27,7 @@ export default defineEventHandler(async (event) => {
     .innerJoin(tables.groups, eq(tables.groupMembers.groupId, tables.groups.id))
     .innerJoin(tables.users, eq(tables.groupMembers.userId, tables.users.id))
     .where(
-      and(
-        eq(tables.groupMembers.userId, userId),
-        eq(tables.groups.id, id)
-      )
+      eq(tables.groups.id, id)
     )
 
   const allPermissions = [

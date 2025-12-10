@@ -24,7 +24,8 @@ export default defineEventHandler(async (event) => {
       .where(
         and(
           eq(tables.groupMembers.userId, userId),
-          sql`${tables.groupMembers.permissions} @> jsonb_build_array(${PERMISSIONS.GUIDE.READ}::text)`
+          sql`${tables.groupMembers.permissions} @> jsonb_build_array(${PERMISSIONS.GUIDE.READ}::text)`,
+          sql`${tables.groupMembers.permissions} @> jsonb_build_array(${PERMISSIONS.GROUP.READ}::text)`
         )
       )
       .limit(1)

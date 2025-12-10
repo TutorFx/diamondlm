@@ -44,6 +44,9 @@ export async function setUserGroupPermissions(db: ReturnType<typeof useDrizzle>,
     ...Object.values(PERMISSIONS.GROUP)
   ] as const
 
+  const redis = useRedis()
+  await redis.del(`user:${params.userId}:last-group`)
+
   if (!userPerms) {
     throw createError({ statusCode: 404, statusMessage: 'Member Permissions not found' })
   }
