@@ -1,6 +1,38 @@
 # Changelog
 
 
+## v0.0.1-3
+
+[compare changes](https://github.com/TutorFx/diamondlm/compare/v0.0.1-2...v0.0.1-3)
+
+### 🚀 Enhancements
+
+- Add health check endpoint for drizzle and redis ([f05e4fd](https://github.com/TutorFx/diamondlm/commit/f05e4fd))
+- Removed unwanted fields from auth state ([333b941](https://github.com/TutorFx/diamondlm/commit/333b941))
+- Add user permissions column, update guides foreign key to cascade deletes, and introduce new seed files. ([37eed2c](https://github.com/TutorFx/diamondlm/commit/37eed2c))
+- **group:** Added manage-permission endpoints ([2e2a19b](https://github.com/TutorFx/diamondlm/commit/2e2a19b))
+- Added member permission table ([215399a](https://github.com/TutorFx/diamondlm/commit/215399a))
+- **member-management:** Enhance member permissions management and update icons ([697ea69](https://github.com/TutorFx/diamondlm/commit/697ea69))
+- Refactor group management layout and update navigation structure ([9bbd743](https://github.com/TutorFx/diamondlm/commit/9bbd743))
+- Implement group member addition functionality with new API, UI, permission updates, and cache invalidation. ([0aeec96](https://github.com/TutorFx/diamondlm/commit/0aeec96))
+
+### 🩹 Fixes
+
+- Add vite configuration for rollup external dependencies ([daa7119](https://github.com/TutorFx/diamondlm/commit/daa7119))
+- Replace dynamic color binding with static color value in AuthPage component ([160a443](https://github.com/TutorFx/diamondlm/commit/160a443))
+- Remove vite configuration for rollup external dependencies ([dab2ba0](https://github.com/TutorFx/diamondlm/commit/dab2ba0))
+- Update guide title display to ensure proper truncation and adjust UChip visibility condition ([aa66f86](https://github.com/TutorFx/diamondlm/commit/aa66f86))
+- Update UContainer layout and enhance topic card hover effects ([f397fd9](https://github.com/TutorFx/diamondlm/commit/f397fd9))
+
+### 🏡 Chore
+
+- **release:** V0.0.1-2 ([2dbdb16](https://github.com/TutorFx/diamondlm/commit/2dbdb16))
+- Remove outdated onboarding and policy documents from the repository ([8a40674](https://github.com/TutorFx/diamondlm/commit/8a40674))
+
+### ❤️ Contributors
+
+- Gabriel Serejo <gabriel_serejo@live.com>
+
 ## v0.0.1-2
 
 [compare changes](https://github.com/TutorFx/diamondlm/compare/v0.0.1-1...v0.0.1-2)
