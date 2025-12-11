@@ -98,12 +98,12 @@ onMounted(() => {
         >
           <template #content="{ message }">
             <div class="*:first:mt-0 *:last:mb-0">
-              <template v-for="(part, index) in message.parts" :key="`${message.id}-${part.type}-${index}${'state' in part ? `-${part.state}` : ''}`">
-                <Reasoning
-                  v-if="part.type === 'reasoning'"
-                  :text="part.text"
-                  :is-streaming="part.state !== 'done'"
-                />
+              <template
+                v-for="(part, index) in (message as AIUIMessage).parts"
+                :key="`${message.id}-${part.type}-${index}${'state' in part ? `-${part.state}` : ''}`"
+              >
+                <Sources v-if="part.type === 'data-source'" :sources="part.data" />
+                <Reasoning v-else-if="part.type === 'reasoning'" :text="part.text" :is-streaming="part.state !== 'done'" />
                 <MDCCached
                   v-else-if="part.type === 'text'"
                   :value="part.text"

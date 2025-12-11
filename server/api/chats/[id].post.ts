@@ -11,6 +11,7 @@ defineRouteMeta({
 
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
+  const sources: DeltaType[] = [] // InferUIMessageChunk<AIUIMessage>
 
   const { id } = await getValidatedRouterParams(event, z.object({
     id: z.string()
@@ -78,10 +79,17 @@ export default defineEventHandler(async (event) => {
   </agent_profile>
 
   <context_database>
-  ${lastMessage?.parts[0].type === 'text'
+  ${lastMessage?.parts[0]?.type === 'text'
     ? await embed.findSimilarChunksAsContext(
         lastMessage?.parts[0].text,
-        session.user?.id || session.id
+        {
+          userId: session.user?.id || session.id,
+          onDelta: (delta) => {
+            if (delta.type === 'search-delta') {
+              sources.push(delta)
+            }
+          }
+        }
       )
     : '<no_context_available />'}
   </context_database>
@@ -116,7 +124,12 @@ export default defineEventHandler(async (event) => {
         experimental_transform: smoothStream({ chunking: 'word' }),
         tools: {
           search: searchTool({
-            userId: session.user?.id || session.id
+            userId: session.user?.id || session.id,
+            onDelta: (delta) => {
+              if (delta.type === 'search-delta') {
+                sources.push(delta)
+              }
+            }
           })
         },
         toolChoice: 'required'
@@ -130,9 +143,22 @@ export default defineEventHandler(async (event) => {
         })
       }
 
-      writer.merge(result.toUIMessageStream({
-        sendReasoning: true
-      }))
+      const uiStream = result.toUIMessageStream({
+        sendReasoning: true,
+        sendStart: false
+      })
+
+      for await (const chunk of uiStream) {
+        writer.write(chunk)
+      }
+
+      if (sources.length > 0) {
+        writer.write({
+          type: 'data-source',
+          transient: false,
+          data: sources
+        })
+      }
     },
     onFinish: async ({ messages }) => {
       await db.insert(tables.messages).values(messages.map(message => ({

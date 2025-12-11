@@ -1,4 +1,4 @@
-import { cosineDistance, and, eq, sql, desc, or, isNull, gt } from 'drizzle-orm'
+import { l2Distance, and, eq, sql, desc, or, isNull } from 'drizzle-orm'
 import { chunk, guides, groupMembers } from '../database/schema'
 import { PERMISSIONS } from '../../shared/utils/permissions'
 import { embed, embedMany } from 'ai'
@@ -25,10 +25,10 @@ export function useEmbedding() {
     return embeddings
   }
 
-  const findSimilarChunks = async (search: string, userId: string | null) => {
-    console.log('Gerando embedding para a descrição fornecida...')
+  const findSimilarChunks = async (search: string, searchParameters?: SearchParameters) => {
+    logger.info(`Gerando embedding a busca: "${search}"`)
     const embedding = await generateEmbedding(search)
-    const similarity = sql<number>`1 - (${cosineDistance(chunk.embedding, embedding)})`
+    const similarity = sql<number>`1 - (${l2Distance(chunk.embedding, embedding)})`
     const similarGuides = await db
       .select({
         similarity,
@@ -44,10 +44,10 @@ export function useEmbedding() {
       .innerJoin(guides, eq(chunk.guideId, guides.id))
       .leftJoin(groupMembers, and(
         eq(groupMembers.groupId, guides.groupId),
-        userId ? eq(groupMembers.userId, userId) : sql`FALSE`
+        searchParameters?.userId ? eq(groupMembers.userId, searchParameters.userId) : sql`FALSE`
       ))
       .where(and(
-        gt(similarity, 0.0),
+        // gt(similarity, -0.5),
         or(
           isNull(guides.groupId),
           sql`${groupMembers.permissions} @> jsonb_build_array(${PERMISSIONS.GUIDE.READ}::text)`
@@ -55,19 +55,42 @@ export function useEmbedding() {
       ))
       .orderBy(t => desc(t.similarity))
       .limit(4)
+
+    if (typeof searchParameters?.onDelta === 'function') {
+      await searchParameters.onDelta({
+        type: 'start-search',
+        search
+      })
+      for (let i = 0; i < similarGuides.length; i++) {
+        const delta = similarGuides[i]
+        if (!delta) continue
+
+        await searchParameters.onDelta({
+          text: delta.chunk.content,
+          id: delta.chunk.id,
+          source: delta.guide.title,
+          type: 'search-delta'
+        })
+      }
+      await searchParameters.onDelta({
+        type: 'end-search'
+      })
+    }
+
     return similarGuides
   }
 
-  const findSimilarChunksAsContext = async (search: string, userId: string | null) => {
-    const results = await findSimilarChunks(search, userId)
+  const findSimilarChunksAsContext = async (search: string, searchParameters?: SearchParameters) => {
+    const results = await findSimilarChunks(search, searchParameters)
 
-    if (results.length === 0) return '<no_context_available />'
+    if (results.length === 0) return '<context_database><no_context_available /></context_database>'
 
     return results.map(result => `
+    <context_database>
       <document id="${result.chunk.id}" relevance="${result.similarity.toFixed(2)}" source="${result.guide.title}">
           ${result.chunk.content}
       </document>
-    `).join('\n')
+    </context_database>`).join('\n')
   }
 
   return { findSimilarChunks, findSimilarChunksAsContext, generateEmbedding, generateManyEmbeddings }
