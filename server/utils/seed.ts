@@ -1,4 +1,4 @@
-import { textSplitter } from './langchain'
+import { splitText } from './langchain'
 import { useDrizzle, tables } from './drizzle'
 import { PERMISSIONS } from '../../shared/utils/permissions'
 import { logger } from '../../shared/utils/logger'
@@ -29,7 +29,7 @@ async function processGuide(db: ReturnType<typeof useDrizzle>, filePath: string,
   const guideId = newGuide.insertedId
   log.log(`Guia "${title}" criado com ID: ${guideId}.`)
 
-  const chunks = await textSplitter.createDocuments([content])
+  const chunks = await splitText({ title, content })
   if (chunks.length === 0) {
     log.log(`Nenhum chunk gerado para o guia "${title}". Pulando.`)
     return
