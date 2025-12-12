@@ -6,6 +6,7 @@ import { and, eq, sql } from 'drizzle-orm'
 
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
+  const log = logger.withTag('API')
 
   if (!session.user) {
     throw createError({
@@ -41,7 +42,7 @@ export default defineEventHandler(async (event) => {
   const llm = useOllama()
 
   const { text: title } = await generateText({
-    model: llm('qwen2.5:7b'),
+    model: llm('qwen3:8b'),
     system: `You are a title generator for a guide:
         - Generate a short title based on the first user's message
         - The title should be less than 30 characters long
@@ -89,7 +90,8 @@ export default defineEventHandler(async (event) => {
       }))
 
       await queue.addBulk(jobs)
-      console.log(`[API] ${jobs.length} chunks enviados para a fila de processamento.`)
+
+      log.log(`${jobs.length} chunks enviados para a fila de processamento.`)
     }
 
     return guide

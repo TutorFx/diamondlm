@@ -20,8 +20,6 @@ export default defineEventHandler(async (event) => {
 
   const sessionUser = await getUserGroupPermissions(db, { userId: userId, groupId: id })
 
-  console.log('sessionUser', sessionUser)
-
   const allowed = sessionUser.permissions[PERMISSIONS.GROUP.MANAGE_MEMBERS]
 
   if (!allowed) {

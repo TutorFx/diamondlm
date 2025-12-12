@@ -1,4 +1,5 @@
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters'
+import { transformMarkdown } from './parsers'
 
 export const textSplitter = new RecursiveCharacterTextSplitter({
   separators: [
@@ -17,8 +18,9 @@ export const textSplitter = new RecursiveCharacterTextSplitter({
 })
 
 export async function splitText(settings: { title: string, content: string }) {
+  const finalMarkdown = await transformMarkdown(settings.content)
   return await textSplitter.createDocuments([
-    settings.content
+    finalMarkdown
   ],
   [
     { document: settings.title }
