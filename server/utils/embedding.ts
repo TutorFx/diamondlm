@@ -16,48 +16,39 @@ export function useEmbedding() {
 
   const generateManyEmbeddings = async (values: string[]) => {
     const model = ollama.textEmbeddingModel('bge-m3')
-
     const { embeddings } = await embedMany({
       model: model,
       values: values
     })
-
     return embeddings
   }
 
   const findSimilarChunks = async (search: string, searchParameters?: SearchParameters) => {
     logger.info(`Gerando embedding a busca: "${search}"`)
 
-    // 1. Extração de Números da Pergunta
-    // A regex abaixo pega sequências de dígitos.
-    // O filtro length >= 3 evita dar boost em números irrelevantes como "1" ou "2" de listas.
+    // Input: "Qual é o CFOP 6119 e a lei 123?"
+    // Output: ['6119', '123'] (ignora "1" ou "20" se length < 3)
     const numbersInQuery = (search.match(/\d+/g) || []).filter(n => n.length >= 3)
 
     const embedding = await generateEmbedding(search)
 
-    // 2. Construção do Score Híbrido
-    // Base: Similaridade Vetorial
-    let similarityScore = sql`1 - (${l2Distance(chunk.embedding, embedding)})`
+    let similarityScore = sql<number>`1 - (${l2Distance(chunk.embedding, embedding)})`
 
-    // Boost: Se houver números, adicionamos pontuação extra
     if (numbersInQuery.length > 0) {
-    // Definimos um peso alto (ex: 1.0) para garantir que o número exato suba para o topo
       const numberBoostWeight = 1.0
 
+      // Input: Chunk com texto "...venda com CFOP 6119..."
+      // Output: +1.0 no score final
       const boostConditions = numbersInQuery.map((num) => {
-      // Verifica se o número existe no conteúdo do chunk
         return sql`CASE WHEN ${chunk.content} ILIKE ${`%${num}%`} THEN ${numberBoostWeight} ELSE 0 END`
       })
 
-      // Soma os boosts ao score original
-      // Ex: score = (vector_score) + (boost_num_1) + (boost_num_2)
+      // Math: (VectorScore 0.75) + (Boost 1.0) = 1.75
       similarityScore = sql`(${similarityScore}) + ${sql.join(boostConditions, sql` + `)}`
     }
 
-    // 3. Execução da Query
     const similarGuides = await db
       .select({
-      // Retornamos o score combinado para debug ou ordenação
         similarity: similarityScore,
         guide: {
           title: guides.title
@@ -74,17 +65,17 @@ export function useEmbedding() {
         searchParameters?.userId ? eq(groupMembers.userId, searchParameters.userId) : sql`FALSE`
       ))
       .where(and(
-      // Atenção: Como somamos 1.0 ao score, o filtro original (-0.5) continua válido,
-      // mas chunks com o número exato terão score > 1.0, passando com certeza.
+        // VectorScore (0.2) + Boost (1.0) = 1.2 -> Passa no filtro > -0.5
+        // VectorScore (0.2) + Boost (0.0) = 0.2 -> Passa no filtro > -0.5
         gt(similarityScore, -0.5),
         or(
           isNull(guides.groupId),
           sql`${groupMembers.permissions} @> jsonb_build_array(${PERMISSIONS.GUIDE.READ}::text)`
         )
       ))
-    // Ordena pelo score híbrido (o chunk com o número 6119 vai para o topo)
+      // Prioridade: Score 1.75 (Boosted) > Score 0.85 (Puro Vetor)
       .orderBy(desc(similarityScore))
-      .limit(4) // Aumentei um pouco o limit para garantir que pegue o contexto certo se houver competição
+      .limit(4)
 
     if (typeof searchParameters?.onDelta === 'function') {
       await searchParameters.onDelta({
