@@ -17,8 +17,10 @@ export const textSplitter = new RecursiveCharacterTextSplitter({
 })
 
 export async function splitText(settings: { title: string, content: string }) {
+  const finalMarkdown = await transformMarkdown(settings.content)
+  console.log(finalMarkdown)
   return await textSplitter.createDocuments([
-    settings.content
+    finalMarkdown
   ],
   [
     { document: settings.title }
