@@ -67,21 +67,12 @@ export default defineEventHandler(async (event) => {
 
   const questions = await generateObject({
     messages: convertToModelMessages(messages),
-    system: `
-Você é um assistente técnico rigoroso. Toda a sua informação vem exclusivamente do contexto fornecido.  
-Sua tarefa é identificar, de forma concisa e em pequenas perguntas separadas, quais são as principais lacunas de informação no contexto atual.  
-
-Para isso:  
-1. Formule apenas perguntas cujas respostas **não estejam presentes** no contexto.  
-2. Inclua perguntas breves que questionem, de forma implícita, se certos termos ou conceitos mencionados são compreensíveis ou definidos (ex: “O que significa X no contexto?”).  
-3. As perguntas devem ser genéricas, mas focadas nos pontos mais relevantes para compreensão ou ação.  
-4. Não use formatação, nem mencione o contexto. Apenas liste as perguntas, uma por linha.  
-
-Se não houver lacunas, retorne: Informação não disponível no contexto fornecido.`,
+    system: `Lista perguntas curtas (≤8 palavras) com termos técnicos/números não explicados no contexto.
+      Uma por linha.`,
     schema: z.object({
       questions: z.array(
-        z.string().describe('Duvida')
-      ).min(0).max(6).describe('Lista de dúvidas')
+        z.string().describe('perguntas')
+      ).min(0).max(6).describe('Lista de perguntas')
     }),
     model: llm
   })
