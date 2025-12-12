@@ -1,4 +1,4 @@
-import { l2Distance, and, eq, sql, desc, or, isNull } from 'drizzle-orm'
+import { l2Distance, and, eq, sql, desc, or, isNull, gt } from 'drizzle-orm'
 import { chunk, guides, groupMembers } from '../database/schema'
 import { PERMISSIONS } from '../../shared/utils/permissions'
 import { embed, embedMany } from 'ai'
@@ -47,14 +47,14 @@ export function useEmbedding() {
         searchParameters?.userId ? eq(groupMembers.userId, searchParameters.userId) : sql`FALSE`
       ))
       .where(and(
-        // gt(similarity, -0.5),
+        gt(similarity, -0.5),
         or(
           isNull(guides.groupId),
           sql`${groupMembers.permissions} @> jsonb_build_array(${PERMISSIONS.GUIDE.READ}::text)`
         )
       ))
       .orderBy(t => desc(t.similarity))
-      .limit(4)
+      .limit(2)
 
     if (typeof searchParameters?.onDelta === 'function') {
       await searchParameters.onDelta({
@@ -80,13 +80,32 @@ export function useEmbedding() {
     return similarGuides
   }
 
-  const findSimilarChunksAsContext = async (search: string, searchParameters?: SearchParameters) => {
-    const results = await findSimilarChunks(search, searchParameters)
+  const findSimilarChunksAsContext = async (search: string | string[], searchParameters?: SearchParameters) => {
+    let searchList: string[]
+
+    if (typeof search === 'string') {
+      searchList = [search]
+    } else if (Array.isArray(search)) {
+      searchList = search
+    } else {
+      throw createError('Invalid search input')
+    }
+
+    const uniqueMap = new Map(
+      (
+        await Promise.all(searchList.map(query => findSimilarChunks(query, searchParameters)))
+      )
+        .flat()
+        .sort((a, b) => a.chunk.id > b.chunk.id ? 1 : -1)
+        .map(obj => [obj.chunk.id, obj])
+    )
+
+    const results = Array.from(uniqueMap.values())
 
     if (results.length === 0) return '<context_database><no_context_available /></context_database>'
 
-    return results.map(result => `
-    <context_database>
+    return results.flat().map(result => `
+    <context_database search="${JSON.stringify(search)}">
       <document id="${result.chunk.id}" relevance="${result.similarity.toFixed(2)}" source="${result.guide.title}">
           ${result.chunk.content}
       </document>

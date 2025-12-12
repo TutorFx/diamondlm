@@ -1,5 +1,6 @@
-import { convertToModelMessages, createUIMessageStream, createUIMessageStreamResponse, generateText, smoothStream, stepCountIs, streamText } from 'ai'
+import { convertToModelMessages, createUIMessageStream, createUIMessageStreamResponse, generateText, smoothStream, stepCountIs, streamText, generateObject } from 'ai'
 import type { UIMessage } from 'ai'
+import { ollama } from 'ai-sdk-ollama'
 import { z } from 'zod/v4'
 
 defineRouteMeta({
@@ -11,7 +12,7 @@ defineRouteMeta({
 
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
-  const sources: DeltaType[] = [] // InferUIMessageChunk<AIUIMessage>
+  const sources = new Map<number, DeltaType>()
 
   const { id } = await getValidatedRouterParams(event, z.object({
     id: z.string()
@@ -22,7 +23,10 @@ export default defineEventHandler(async (event) => {
     messages: z.array(z.custom<UIMessage>())
   }).parse)
 
-  const llm = useOllama()
+  const llm = ollama(model, {
+    reasoning: false
+  })
+
   const db = useDrizzle()
 
   const chat = await db.query.chats.findFirst({
@@ -37,7 +41,7 @@ export default defineEventHandler(async (event) => {
 
   if (!chat.title) {
     const { text: title } = await generateText({
-      model: llm(model),
+      model: llm,
       system: `You are a title generator for a chat:
           - Generate a short title based on the first user's message
           - The title should be less than 30 characters long
@@ -61,73 +65,91 @@ export default defineEventHandler(async (event) => {
 
   const embed = useEmbedding()
 
+  const questions = await generateObject({
+    messages: convertToModelMessages(messages),
+    system: `
+Você é um assistente técnico rigoroso. Toda a sua informação vem exclusivamente do contexto fornecido.  
+Sua tarefa é identificar, de forma concisa e em pequenas perguntas separadas, quais são as principais lacunas de informação no contexto atual.  
+
+Para isso:  
+1. Formule apenas perguntas cujas respostas **não estejam presentes** no contexto.  
+2. Inclua perguntas breves que questionem, de forma implícita, se certos termos ou conceitos mencionados são compreensíveis ou definidos (ex: “O que significa X no contexto?”).  
+3. As perguntas devem ser genéricas, mas focadas nos pontos mais relevantes para compreensão ou ação.  
+4. Não use formatação, nem mencione o contexto. Apenas liste as perguntas, uma por linha.  
+
+Se não houver lacunas, retorne: Informação não disponível no contexto fornecido.`,
+    schema: z.object({
+      questions: z.array(
+        z.string().describe('Duvida')
+      ).min(0).max(6).describe('Lista de dúvidas')
+    }),
+    model: llm
+  })
+
+  const chunks = await embed.findSimilarChunksAsContext(
+    questions.object.questions,
+    {
+      userId: session.user?.id || session.id,
+      onDelta: (delta) => {
+        if (delta.type === 'search-delta') {
+          sources.set(delta.id, delta)
+        }
+      }
+    }
+  )
+
   const stream = createUIMessageStream({
     execute: async ({ writer }) => {
       const result = streamText({
-        model: llm(model),
+        model: llm,
         system: /* xml */`
 <system_configuration>
   <agent_profile>
     <identity>
-        Você é um assistente de IA avançado integrado a uma API técnica de alta performance.
-        Sua função é processar consultas complexas, analisar dados recuperados e fornecer respostas tecnicamente precisas e fundamentadas.
+      Você é um assistente técnico rigoroso, integrado a um sistema de recuperação de contexto.
+      Você NÃO possui conhecimento geral ou de treinamento. Toda a sua informação vem EXCLUSIVAMENTE do bloco <context_database>.
     </identity>
     <tone>
-        Profissional, objetivo, tecnicamente denso mas acessível. Evite floreios conversacionais desnecessários (ex: "Espero que isso ajude").
-        Vá direto à resposta após o raciocínio.
+      Direto, técnico, preciso. Nada de suposições, adivinhações ou preenchimento.
+      Se a resposta não estiver no contexto, diga: "Informação não disponível no contexto fornecido."
     </tone>
   </agent_profile>
 
   <context_database>
-  ${lastMessage?.parts[0]?.type === 'text'
-    ? await embed.findSimilarChunksAsContext(
-        lastMessage?.parts[0].text,
-        {
-          userId: session.user?.id || session.id,
-          onDelta: (delta) => {
-            if (delta.type === 'search-delta') {
-              sources.push(delta)
-            }
-          }
-        }
-      )
-    : '<no_context_available />'}
+  ${
+    chunks.length > 0
+      ? chunks
+      : '<no_context_available />'
+  }
   </context_database>
 
   <prime_directives>
-    <constraint type="negative" priority="critical">
-        NÃO invente informações. Se a resposta não estiver contida estritamente no <context_database>, declare explicitamente: "Informação não disponível no contexto fornecido."
+    <constraint priority="critical">
+      VOCÊ NÃO TEM ACESSO AO SEU CONHECIMENTO DE TREINAMENTO.
+      O ÚNICO CONHECIMENTO VÁLIDO É O FORNECIDO EM <context_database>.
     </constraint>
-    <constraint type="negative" priority="critical">
-        NUNCA sugira que o usuário utilize as ferramentas (tools). As ferramentas são de uso exclusivo do agente e devem ser utilizadas de forma autônoma.
+    <constraint priority="critical">
+      SE A RESPOSTA NÃO ESTIVER TOTALMENTE CONTIDA NO <context_database>, RESPONDA EXATAMENTE:
+      "Informação não disponível no contexto fornecido."
     </constraint>
-    <constraint type="negative" priority="high">
-        NÃO faça referência ao seu próprio conhecimento de treinamento se ele conflitar com o contexto fornecido. O <context_database> é a única fonte da verdade para fatos específicos.
+    <constraint priority="high">
+      NÃO mencione o contexto, nem diga "com base no contexto". Vá direto ao ponto.
     </constraint>
-    <constraint type="negative" priority="medium">
-        NÃO inclua blocos de markdown a menos que explicitamente solicitado para gerar código ou dados estruturados.
-    </constraint>
-    <constraint type="negative" priority="medium">
-        NÃO inicie a resposta com frases de preenchimento como "Com base nos documentos...". Inicie a resposta factual diretamente.
+    <constraint priority="medium">
+      Use Markdown para estruturação (títulos, listas), mas nunca para código, a menos que solicitado.
     </constraint>
   </prime_directives>
-
-  <formatting_protocol>
-    <formatting_protocol_instruction>
-      Use Markdown padrão para estruturação (h2, h3, bullet points)
-    </formatting_protocol_instruction>
-  </formatting_protocol>
 </system_configuration>
-`,
+/think`,
         messages: convertToModelMessages(messages),
-        stopWhen: stepCountIs(10),
+        stopWhen: stepCountIs(3),
         experimental_transform: smoothStream({ chunking: 'word' }),
         tools: {
           search: searchTool({
             userId: session.user?.id || session.id,
             onDelta: (delta) => {
               if (delta.type === 'search-delta') {
-                sources.push(delta)
+                sources.set(delta.id, delta)
               }
             }
           })
@@ -152,11 +174,13 @@ export default defineEventHandler(async (event) => {
         writer.write(chunk)
       }
 
-      if (sources.length > 0) {
+      const uniqueSources = Array.from(sources.values())
+
+      if (uniqueSources.length > 0) {
         writer.write({
           type: 'data-source',
           transient: false,
-          data: sources
+          data: Array.from(uniqueSources.values())
         })
       }
     },
