@@ -137,6 +137,7 @@ const columns: TableColumn<PermissionData>[] = [
 
 const isAddMemberOpen = ref(false)
 const isAddingMember = ref(false)
+
 const addMemberState = reactive({
   email: ''
 })
