@@ -266,7 +266,7 @@ onMounted(async () => {
     </UDashboardSidebar>
 
     <UDashboardSearch
-      placeholder="Search chats..."
+      placeholder="Buscar conversas..."
       :groups="[{
         id: 'links',
         items: [{
