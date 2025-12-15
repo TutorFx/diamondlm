@@ -1,7 +1,13 @@
 import { createOllama } from 'ollama-ai-provider-v2'
 
+let ollama: ReturnType<typeof createOllama>
+
 export function useOllama() {
-  return createOllama({
-    baseURL: process.env.OLLAMA_BASE_URL
-  })
+  if (!ollama) {
+    ollama = createOllama({
+      baseURL: process.env.OLLAMA_BASE_URL
+    })
+  }
+
+  return ollama
 }
