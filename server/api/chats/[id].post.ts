@@ -23,9 +23,7 @@ export default defineEventHandler(async (event) => {
     messages: z.array(z.custom<UIMessage>())
   }).parse)
 
-  const llm = ollama(model, {
-    reasoning: false
-  })
+  const llm = ollama(model)
 
   const db = useDrizzle()
 

@@ -1,4 +1,4 @@
-import { createOllama } from 'ai-sdk-ollama'
+import { createOllama } from 'ollama-ai-provider-v2'
 
 let ollama: ReturnType<typeof createOllama>
 
