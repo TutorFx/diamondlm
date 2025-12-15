@@ -1,6 +1,31 @@
 # Changelog
 
 
+## v0.0.2-rc.0
+
+[compare changes](https://github.com/TutorFx/diamondlm/compare/v0.0.1-3...v0.0.2-rc.0)
+
+### 🚀 Enhancements
+
+- Add Sources component and integrate data source handling in chat and embedding functionalities ([5d05abd](https://github.com/TutorFx/diamondlm/commit/5d05abd))
+- Sources ([ebfe317](https://github.com/TutorFx/diamondlm/commit/ebfe317))
+- Update model versions and enhance embedding functionality ([0d020e0](https://github.com/TutorFx/diamondlm/commit/0d020e0))
+- Enhance API logging and update model version in guides.post.ts; add markdown transformation utilities in parsers.ts ([472dd06](https://github.com/TutorFx/diamondlm/commit/472dd06))
+- Enhance embedding similarity scoring with number boosting; update text processing in seed and langchain utilities ([f6058cb](https://github.com/TutorFx/diamondlm/commit/f6058cb))
+- Enhance similarity scoring by adding number boosting; improve comments for clarity ([ca87e79](https://github.com/TutorFx/diamondlm/commit/ca87e79))
+- **rag:** Implement hybrid search boosting and structured markdown parsing ([#8](https://github.com/TutorFx/diamondlm/pull/8))
+- Simplify question generation system prompt and update schema descriptions ([fcea760](https://github.com/TutorFx/diamondlm/commit/fcea760))
+- **auth:** Improved auth screens ([a0eba7c](https://github.com/TutorFx/diamondlm/commit/a0eba7c))
+- **auth:** Improved auth screens ([e989024](https://github.com/TutorFx/diamondlm/commit/e989024))
+
+### 🏡 Chore
+
+- **release:** V0.0.1-3 ([47c4f61](https://github.com/TutorFx/diamondlm/commit/47c4f61))
+
+### ❤️ Contributors
+
+- Gabriel Serejo <gabriel_serejo@live.com>
+
 ## v0.0.1-3
 
 [compare changes](https://github.com/TutorFx/diamondlm/compare/v0.0.1-2...v0.0.1-3)
