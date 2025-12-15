@@ -1,6 +1,5 @@
 import { convertToModelMessages, createUIMessageStream, createUIMessageStreamResponse, generateText, smoothStream, stepCountIs, streamText, generateObject } from 'ai'
 import type { UIMessage } from 'ai'
-import { ollama } from 'ai-sdk-ollama'
 import { z } from 'zod/v4'
 
 defineRouteMeta({
@@ -12,6 +11,7 @@ defineRouteMeta({
 
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
+  const ollama = useOllama()
   const sources = new Map<number, DeltaType>()
 
   const { id } = await getValidatedRouterParams(event, z.object({
