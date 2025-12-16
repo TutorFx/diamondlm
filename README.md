@@ -1,120 +1,51 @@
 # 💎 Diamond LLM
 
-Diamond LLM is a modern, high-performance chat interface for Large Language Models (LLMs), built with **Nuxt 4** and **Nuxt UI**. It features a robust Retrieval-Augmented Generation (RAG) system, group-based access control, and a seamless user experience.
+[![Nuxt](https://img.shields.io/badge/Nuxt-4.1-00DC82?style=flat&logo=nuxt.js)](https://nuxt.com)
+[![Bun](https://img.shields.io/badge/Bun-%23000000.svg?style=flat&logo=bun&logoColor=white)](https://bun.sh)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=flat&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
----
+**Diamond LLM** is a high-performance chat interface for Large Language Models, engineered with **Nuxt 4** and **Nuxt UI**. It leverages a robust Retrieval-Augmented Generation (RAG) system, granular access control, and a premium user experience.
 
-## ✨ Key Features
+## ✨ Features
 
-### 🤖 AI & Chat
-- **Multi-Model Support**: Integrated with **Google Gemini** and **Ollama** for local model inference.
-- **Streaming Responses**: Real-time token streaming for a responsive chat experience.
-- **Syntax Highlighting**: Automatic code block highlighting using **Shiki**.
-- **Chat History**: Persistent chat history stored in PostgreSQL.
+- **🤖 AI & Chat**: Multi-model support (Gemini, Ollama), real-time streaming, and syntax highlighting.
+- **📚 RAG System**: Hybrid search with [pgvector](https://github.com/pgvector/pgvector), number boosting, and markdown parsing.
+- **👥 Team Management**: Hierarchical groups, granular ACL permissions, and private knowledge bases.
+- **📝 Content Engine**: Monaco Editor integration for managing technical guides and documentation.
 
-### 📚 RAG (Retrieval-Augmented Generation)
-- **Vector Database**: Utilizes **Postgres Vector** for storing and retrieving embeddings.
-- **Contextual Awareness**: Enhances LLM responses by retrieving relevant information from your knowledge base (Guides).
-- **Text Splitting**: Intelligent text chunking using **LangChain** for optimal embedding generation.
+## 🚀 Quick Start
 
-### 👥 Groups & Permissions
-- **Organization Support**: Create and manage groups (e.g., teams, departments).
-- **Access Control (ACL)**: Granular permissions for group members (e.g., `guide:read`, `guide:create`).
-- **Public & Private Guides**: Support for both public guides and private group-specific knowledge bases.
+Get up and running in minutes.
 
-### 📝 Content Management
-- **Code Editor**: **Monaco Editor** integration for creating and editing guides.
-- **Markdown Support**: Full markdown support for guide content.
-- **Guide Management**: Create, edit, and delete guides.
-- **Background Processing**: **BullMQ** handles heavy tasks like embedding generation asynchronously.
+1. **Install**: Clone and install dependencies.
+2. **Configure**: Set up your `.env`.
+3. **Run**: Start the development server.
 
-### 🛠️ Technical Stack
-- **Framework**: [Nuxt 4](https://nuxt.com/) (Vue.js)
-- **UI Library**: [Nuxt UI](https://ui.nuxt.com/) (TailwindCSS)
-- **Database**: PostgreSQL with [Drizzle ORM](https://orm.drizzle.team/)
-- **Vector DB**: [Postgres Vector](https://github.com/pgvector/pgvector)
-- **Queues**: [BullMQ](https://bullmq.io/) with Redis
-- **Auth**: [Nuxt Auth Utils](https://github.com/atinux/nuxt-auth-utils)
-- **Runtime**: [Bun](https://bun.sh/)
+👉 **[View Full Setup Guide](./DOCS/SETUP.md)**
 
----
+## 📖 Documentation
 
-## 🚀 Getting Started
+Everything you need to know about Diamond LLM.
 
-### 1. Prerequisites
-- **Node.js** (v20+)
-- **Bun** (latest)
-- **PostgreSQL** database
-- **Redis** instance (for BullMQ)
-- **PostgreSQL** database with **pgvector** extension
+- **[Setup & Installation](./DOCS/SETUP.md)**
+- **[RAG Architecture](./DOCS/RAG.md)**
+- **[Groups & Permissions](./DOCS/GROUPS.md)**
+- **[Database Seeding](./DOCS/SEEDING.md)**
+- **[Changelog](./CHANGELOG.md)**
 
-### 2. Installation
+## 💻 Tech Stack
 
-```bash
-# Clone the repository
-git clone https://github.com/TutorFx/diamondlm.git
+- **Framework**: [Nuxt 4](https://nuxt.com)
+- **UI**: [Nuxt UI](https://ui.nuxt.com)
+- **Database**: PostgreSQL (Drizzle ORM)
+- **Vector DB**: pgvector
+- **Queue**: BullMQ with Redis
+- **Runtime**: Bun
 
-# Navigate to the directory
-cd diamond-llm
+## 🤝 Contribution
 
-# Install dependencies
-bun install
-```
+Contributions are welcome! Please read our **[Contributing Guide](./CONTRIBUTING.md)** before submitting a Pull Request.
 
-### 3. Environment Setup
-
-Create a `.env` file in the root directory:
-
-```env
-POSTGRES_USER="testuser"
-POSTGRES_PASSWORD="testpass"
-POSTGRES_DB="dbname"
-POSTGRES_PORT=9293
-POSTGRES_HOSTNAME="127.0.0.1"
-
-
-OLLAMA_BASE_URL="http://127.0.0.1:11434/api"
-
-REDIS_PASSWORD=sua_senha_secreta_redis
-REDIS_PORT=6379
-```
-
-### 4. Database Setup
-
-Run migrations to set up the database schema:
-
-```bash
-bun run db:generate
-bun run db:migrate
-```
-
-### 5. Running Development Server
-
-```bash
-bun run dev
-```
-The application will be available at `http://localhost:3000`.
-
----
-
-## 📁 Project Structure
-
-```
-diamond-llm/
-├── app/                  # Frontend logic (Nuxt)
-│   ├── components/       # Vue components
-│   ├── composables/      # Shared logic (hooks)
-│   ├── layouts/          # Page layouts
-│   ├── pages/            # File-based routing
-│   └── plugins/          # Nuxt plugins
-├── server/               # Backend logic (Nitro)
-│   ├── api/              # API endpoints
-│   ├── database/         # Drizzle schema & config
-│   └── utils/            # Server-side utilities
-├── shared/               # Shared types and utils
-└── public/               # Static assets
-```
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
+<!-- Badges and footer -->
+[comparison]: https://github.com/TutorFx/diamondlm/compare
