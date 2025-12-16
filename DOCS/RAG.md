@@ -9,21 +9,32 @@ The pipeline consists of four main stages:
 1.  **Ingestion**: Guides are written in Markdown.
 2.  **Processing**: Text is split recursively using `langchain`.
 3.  **Embedding**: Vectors are generated via Ollama/Gemini.
-4.  **Retrieval**: Hybrid search finds the most relevant chunks.
+4.  **Proactive Retrieval**: System generates queries and fetches initial context.
+5.  **Agentic Refinement**: The LLM (Agent) analyzes the context and uses tools to search for missing details if necessary.
 
 ```mermaid
 graph LR
-    A[Guide] --> B(Splitter)
-    B --> C{Embedding Worker}
-    C --> D[(pgvector)]
-    E[User Query] --> F(Search)
-    D --> F
-    F --> G[LLM Context]
+    User[User Message] --> QGen{Query Gen}
+    QGen -->|Optimized Queries| VectorDB[(pgvector)]
+    VectorDB -->|Initial Context| Agent{Agentic LLM}
+    
+    subgraph Agentic Loop
+    Agent -->|Decides to Search| Tool[Search Tool]
+    Tool -->|New Context| Agent
+    end
+
+    Agent --> Final[Final Response]
 ```
 
 ## ✨ Key Features
 
+### 🔍 Dual-Layer Retrieval
+Diamond LLM combines two powerful retrieval strategies:
+1.  **Proactive Search**: Before the LLM starts, the system analyzes the user's intent, generates targeted questions, and fetches relevant documentation.
+2.  **Agentic Search (Tools)**: The LLM is equipped with a `search` tool. If the initial context is insufficient, it acts as an agent, autonomously querying the database for more specific information.
+
 ### Hybrid Search & Boosting
+(Static RAG)
 We don't rely solely on cosine similarity. The search algorithm scores based on:
 - **Vector Similarity**: Semantic match (cosine distance).
 - **Number Boosting**: Penalty/Reward for matching numerical identifiers (critical for error codes like `500` or `v2`).
