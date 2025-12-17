@@ -123,9 +123,12 @@ export function useEmbedding() {
 
     const results = Array.from(uniqueMap.values())
 
-    if (results.length === 0) return '<context_database><no_context_available /></context_database>'
+    if (results.length === 0) return /* xml */`
+    <context_database>
+      <no_context_available>Informação não disponível no contexto fornecido.</no_context_available>
+    </context_database>`
 
-    return results.flat().map(result => `
+    return results.flat().map(result => /* xml */`
     <context_database search="${JSON.stringify(search)}">
       <document id="${result.chunk.id}" relevance="${result.similarity.toFixed(2)}" source="${result.guide.title}">
           ${result.chunk.content}

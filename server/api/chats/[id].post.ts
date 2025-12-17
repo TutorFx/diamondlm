@@ -104,13 +104,7 @@ export default defineEventHandler(async (event) => {
     </tone>
   </agent_profile>
 
-  <context_database>
-  ${
-    chunks.length > 0
-      ? chunks
-      : '<no_context_available />'
-  }
-  </context_database>
+  ${chunks}
 
   <prime_directives>
     <constraint priority="critical">
