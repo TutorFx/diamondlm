@@ -12,3 +12,5 @@ export interface SearchParameters {
   onDelta?: DeltaCallback
   userId: string | null
 }
+
+export type AudioDelta = string

@@ -15,6 +15,7 @@ const route = useRoute()
 const toast = useToast()
 const clipboard = useClipboard()
 const { model } = useModels()
+const { initContext, enqueueAudio } = useAudioPlayer()
 
 const { data } = await useFetch(`/api/chats/${route.params.id}`, {
   cache: 'force-cache'
@@ -39,6 +40,9 @@ const chat = new Chat({
     if (dataPart.type === 'data-chat-title') {
       refreshNuxtData('chats')
     }
+    if (dataPart.type === 'data-audio') {
+      enqueueAudio(dataPart.data as string)
+    }
   },
   onError(error) {
     const { message } = typeof error.message === 'string' && error.message[0] === '{' ? JSON.parse(error.message) : error
@@ -53,6 +57,7 @@ const chat = new Chat({
 
 function handleSubmit(e: Event) {
   e.preventDefault()
+  initContext()
   if (input.value.trim()) {
     chat.sendMessage({
       text: input.value
@@ -74,6 +79,7 @@ function copy(e: MouseEvent, message: UIMessage) {
 }
 
 onMounted(() => {
+  initContext()
   if (data.value?.messages.length === 1) {
     chat.regenerate()
   }

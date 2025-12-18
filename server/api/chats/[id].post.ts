@@ -153,8 +153,18 @@ export default defineEventHandler(async (event) => {
         sendStart: false
       })
 
+      const { finishStream, pushStream } = audioHandler({
+        model: kokoro,
+        onAudioDelta: (audio) => {
+          writer.write({ type: 'data-audio', data: Buffer.from(audio).toString('base64') })
+        }
+      })
+
       for await (const chunk of uiStream) {
         writer.write(chunk)
+        if (chunk.type === 'text-delta') {
+          pushStream(chunk.delta)
+        }
       }
 
       const uniqueSources = Array.from(sources.values())
@@ -166,6 +176,8 @@ export default defineEventHandler(async (event) => {
           data: Array.from(uniqueSources.values())
         })
       }
+
+      await finishStream()
     },
     onFinish: async ({ messages }) => {
       await db.insert(tables.messages).values(messages.map(message => ({

@@ -4,5 +4,6 @@ export type AIUIMessage = UIMessage<
   never,
   {
     source: DeltaType[]
+    audio: AudioDelta
   }
 >
