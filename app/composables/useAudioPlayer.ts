@@ -2,13 +2,14 @@ import { onUnmounted } from 'vue'
 
 export function useAudioPlayer() {
   let audioContext: AudioContext | null = null
-
   let nextStartTime = 0
-
   let queuePromise = Promise.resolve()
 
+  const activeSources: AudioBufferSourceNode[] = []
+  let queueGeneration = 0
+
   /**
-   * Inicializa o contexto. OBRIGATÓRIO chamar em um clique do usuário.
+   * Inicializa o contexto.
    */
   const initContext = () => {
     if (!audioContext) {
@@ -21,9 +22,6 @@ export function useAudioPlayer() {
     }
   }
 
-  /**
-   * Transforma Base64 em ArrayBuffer
-   */
   const base64ToArrayBuffer = (base64: string) => {
     const binaryString = window.atob(base64)
     const len = binaryString.length
@@ -34,23 +32,57 @@ export function useAudioPlayer() {
     return bytes.buffer
   }
 
-  /**
-   * Recebe o base64, decodifica e agenda.
-   */
+  const clearQueue = () => {
+    queueGeneration++
+
+    activeSources.forEach((source) => {
+      try {
+        source.stop()
+      } catch {
+        // ignore
+      }
+      source.disconnect()
+    })
+
+    activeSources.length = 0
+
+    if (audioContext) {
+      nextStartTime = audioContext.currentTime
+    } else {
+      nextStartTime = 0
+    }
+
+    queuePromise = Promise.resolve()
+  }
+
   const enqueueAudio = (base64: string) => {
     if (!base64) return
 
+    const currentGeneration = queueGeneration
+
     queuePromise = queuePromise.then(async () => {
+      if (currentGeneration !== queueGeneration) return
       if (!audioContext) return
 
       try {
         const arrayBuffer = base64ToArrayBuffer(base64)
+        if (currentGeneration !== queueGeneration) return
 
         const audioBuffer = await audioContext.decodeAudioData(arrayBuffer)
+        if (currentGeneration !== queueGeneration) return
 
         const source = audioContext.createBufferSource()
         source.buffer = audioBuffer
         source.connect(audioContext.destination)
+
+        activeSources.push(source)
+
+        source.onended = () => {
+          const index = activeSources.indexOf(source)
+          if (index > -1) {
+            activeSources.splice(index, 1)
+          }
+        }
 
         const currentTime = audioContext.currentTime
 
@@ -59,20 +91,23 @@ export function useAudioPlayer() {
         }
 
         source.start(nextStartTime)
-
         nextStartTime += audioBuffer.duration
       } catch (error) {
-        console.error('Erro ao processar chunk de áudio:', error)
+        if (currentGeneration === queueGeneration) {
+          console.error('Audio processing error:', error)
+        }
       }
     })
   }
 
   onUnmounted(() => {
+    clearQueue()
     if (audioContext) audioContext.close()
   })
 
   return {
     initContext,
-    enqueueAudio
+    enqueueAudio,
+    clearQueue
   }
 }

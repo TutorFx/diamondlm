@@ -3,7 +3,7 @@ import type { DefineComponent } from 'vue'
 import { Chat } from '@ai-sdk/vue'
 import { DefaultChatTransport } from 'ai'
 import type { UIMessage } from 'ai'
-import { useClipboard } from '@vueuse/core'
+import { useClipboard, useDebounceFn } from '@vueuse/core'
 import { getTextFromMessage } from '@nuxt/ui/utils/ai'
 import ProseStreamPre from '../../components/prose/PreStream.vue'
 
@@ -15,7 +15,25 @@ const route = useRoute()
 const toast = useToast()
 const clipboard = useClipboard()
 const { model } = useModels()
-const { initContext, enqueueAudio } = useAudioPlayer()
+const { initContext, enqueueAudio, clearQueue } = useAudioPlayer()
+const { isListening, isSupported, toggle } = useMic({
+  onResult: (text) => {
+    input.value = input.value ? `${input.value} ${text}` : text
+    chat.stop()
+    clearQueue()
+    debouncedFn()
+  }
+})
+
+const debouncedFn = useDebounceFn(() => {
+  initContext()
+  if (input.value.trim()) {
+    chat.sendMessage({
+      text: input.value
+    })
+    input.value = ''
+  }
+}, 3000)
 
 const { data } = await useFetch(`/api/chats/${route.params.id}`, {
   cache: 'force-cache'
@@ -109,7 +127,11 @@ onMounted(() => {
                 :key="`${message.id}-${part.type}-${index}${'state' in part ? `-${part.state}` : ''}`"
               >
                 <Sources v-if="part.type === 'data-source'" :sources="part.data" />
-                <Reasoning v-else-if="part.type === 'reasoning'" :text="part.text" :is-streaming="part.state !== 'done'" />
+                <Reasoning
+                  v-else-if="part.type === 'reasoning'"
+                  :text="part.text"
+                  :is-streaming="part.state !== 'done'"
+                />
                 <MDCCached
                   v-else-if="part.type === 'text'"
                   :value="part.text"
@@ -132,13 +154,22 @@ onMounted(() => {
         >
           <template #footer>
             <ModelSelect v-model="model" />
+            <div class="flex gap-3">
+              <UButton
+                v-if="isSupported"
+                :icon="isListening ? 'lucide:mic-off' : 'lucide:mic'"
+                :color="isListening ? 'primary' : 'neutral'"
+                variant="ghost"
+                @click="toggle"
+              />
 
-            <UChatPromptSubmit
-              :status="chat.status"
-              color="neutral"
-              @stop="chat.stop"
-              @reload="chat.regenerate"
-            />
+              <UChatPromptSubmit
+                :status="chat.status"
+                color="neutral"
+                @stop="chat.stop"
+                @reload="chat.regenerate"
+              />
+            </div>
           </template>
         </UChatPrompt>
       </UContainer>

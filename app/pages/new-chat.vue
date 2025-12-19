@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useDebounceFn } from '@vueuse/core'
+
 definePageMeta({
   middleware: ['authed']
 })
@@ -7,6 +9,19 @@ const input = ref('')
 const loading = ref(false)
 
 const { model } = useModels()
+const { isListening, isSupported, toggle } = useMic({
+  onResult: (text) => {
+    input.value = input.value ? `${input.value} ${text}` : text
+    debouncedFn()
+  }
+})
+
+const debouncedFn = useDebounceFn(() => {
+  if (input.value.trim()) {
+    createChat(input.value)
+    input.value = ''
+  }
+}, 3000)
 
 async function createChat(prompt: string) {
   input.value = prompt
@@ -67,7 +82,16 @@ const quickChats = [
           variant="subtle"
           @submit="onSubmit"
         >
-          <UChatPromptSubmit color="neutral" />
+          <div class="flex gap-3">
+            <UButton
+              v-if="isSupported"
+              :icon="isListening ? 'lucide:mic-off' : 'lucide:mic'"
+              :color="isListening ? 'primary' : 'neutral'"
+              variant="ghost"
+              @click="toggle"
+            />
+            <UChatPromptSubmit color="neutral" />
+          </div>
 
           <template #footer>
             <ModelSelect v-model="model" />
@@ -78,7 +102,6 @@ const quickChats = [
           <Motion
             v-for="(quickChat, index) in quickChats"
             :key="quickChat.label"
-
             :initial="{
               scale: 1.1,
               opacity: 0,
