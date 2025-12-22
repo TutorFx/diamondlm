@@ -83,13 +83,19 @@ const quickChats = [
           @submit="onSubmit"
         >
           <div class="flex gap-3">
-            <UButton
-              v-if="isSupported"
-              :icon="isListening ? 'lucide:mic-off' : 'lucide:mic'"
-              :color="isListening ? 'primary' : 'neutral'"
-              variant="ghost"
-              @click="toggle"
-            />
+            <ClientOnly>
+              <UButton
+                v-if="isSupported"
+                :icon="isListening ? 'lucide:mic' : 'lucide:mic-off'"
+                :color="isListening ? 'primary' : 'neutral'"
+                variant="ghost"
+                @click="toggle"
+              />
+
+              <slot name="fallback">
+                <div class="size-8" />
+              </slot>
+            </ClientOnly>
             <UChatPromptSubmit color="neutral" />
           </div>
 

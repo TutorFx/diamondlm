@@ -1,16 +1,17 @@
-import { onUnmounted } from 'vue'
+const isProcessing = ref(false)
 
+// Aceita a variável reativa que controla o Mute como parâmetro
 export function useAudioPlayer() {
   let audioContext: AudioContext | null = null
+  let masterGain: GainNode | null = null
   let nextStartTime = 0
   let queuePromise = Promise.resolve()
 
   const activeSources: AudioBufferSourceNode[] = []
   let queueGeneration = 0
 
-  /**
-   * Inicializa o contexto.
-   */
+  const { audioEnabled } = useAudioSettings()
+
   const initContext = () => {
     if (!audioContext) {
       const AudioContextCtor = window.AudioContext
@@ -20,7 +21,21 @@ export function useAudioPlayer() {
     } else if (audioContext.state === 'suspended') {
       audioContext.resume()
     }
+
+    if (audioContext && !masterGain) {
+      masterGain = audioContext.createGain()
+      masterGain.connect(audioContext.destination)
+
+      if (!audioEnabled.value) masterGain.gain.value = 0
+    }
   }
+
+  watch(audioEnabled, (isAudioActive) => {
+    if (!audioContext || !masterGain) return
+
+    const currentTime = audioContext.currentTime
+    masterGain.gain.setTargetAtTime(isAudioActive ? 1 : 0, currentTime, 0.05)
+  })
 
   const base64ToArrayBuffer = (base64: string) => {
     const binaryString = window.atob(base64)
@@ -45,6 +60,7 @@ export function useAudioPlayer() {
     })
 
     activeSources.length = 0
+    isProcessing.value = false
 
     if (audioContext) {
       nextStartTime = audioContext.currentTime
@@ -56,13 +72,15 @@ export function useAudioPlayer() {
   }
 
   const enqueueAudio = (base64: string) => {
-    if (!base64) return
+    if (!base64 || !audioEnabled.value) return
 
     const currentGeneration = queueGeneration
 
     queuePromise = queuePromise.then(async () => {
       if (currentGeneration !== queueGeneration) return
-      if (!audioContext) return
+
+      initContext()
+      if (!audioContext || !masterGain) return
 
       try {
         const arrayBuffer = base64ToArrayBuffer(base64)
@@ -73,14 +91,18 @@ export function useAudioPlayer() {
 
         const source = audioContext.createBufferSource()
         source.buffer = audioBuffer
-        source.connect(audioContext.destination)
+        source.connect(masterGain)
 
         activeSources.push(source)
+        isProcessing.value = true
 
         source.onended = () => {
           const index = activeSources.indexOf(source)
           if (index > -1) {
             activeSources.splice(index, 1)
+            if (activeSources.length === 0) {
+              isProcessing.value = false
+            }
           }
         }
 
@@ -108,6 +130,7 @@ export function useAudioPlayer() {
   return {
     initContext,
     enqueueAudio,
-    clearQueue
+    clearQueue,
+    isProcessing: readonly(isProcessing)
   }
 }

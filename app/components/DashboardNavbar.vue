@@ -4,7 +4,10 @@
     :ui="{ left: 'pointer-events-auto', right: 'pointer-events-auto' }"
   >
     <template #right>
-      <UColorModeButton />
+      <div class="flex gap-1">
+        <AudioToggleButton />
+        <UColorModeButton />
+      </div>
 
       <UButton
         color="neutral"

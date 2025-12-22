@@ -16,6 +16,7 @@ const toast = useToast()
 const clipboard = useClipboard()
 const { model } = useModels()
 const { initContext, enqueueAudio, clearQueue } = useAudioPlayer()
+const { audioEnabled } = useAudioSettings()
 const { isListening, isSupported, toggle } = useMic({
   onResult: (text) => {
     input.value = input.value ? `${input.value} ${text}` : text
@@ -51,7 +52,8 @@ const chat = new Chat({
   transport: new DefaultChatTransport({
     api: `/api/chats/${data.value.id}`,
     body: {
-      model: model.value
+      model: model.value,
+      audio: audioEnabled.value
     }
   }),
   onData: (dataPart) => {
@@ -155,13 +157,18 @@ onMounted(() => {
           <template #footer>
             <ModelSelect v-model="model" />
             <div class="flex gap-3">
-              <UButton
-                v-if="isSupported"
-                :icon="isListening ? 'lucide:mic-off' : 'lucide:mic'"
-                :color="isListening ? 'primary' : 'neutral'"
-                variant="ghost"
-                @click="toggle"
-              />
+              <ClientOnly>
+                <UButton
+                  v-if="isSupported"
+                  :icon="isListening ? 'lucide:mic-off' : 'lucide:mic'"
+                  :color="isListening ? 'primary' : 'neutral'"
+                  variant="ghost"
+                  @click="toggle"
+                />
+                <template #fallback>
+                  <div class="size-8" />
+                </template>
+              </ClientOnly>
 
               <UChatPromptSubmit
                 :status="chat.status"

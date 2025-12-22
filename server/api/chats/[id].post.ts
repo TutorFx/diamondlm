@@ -18,9 +18,10 @@ export default defineEventHandler(async (event) => {
     id: z.string()
   }).parse)
 
-  const { model, messages } = await readValidatedBody(event, z.object({
+  const { model, messages, audio } = await readValidatedBody(event, z.object({
     model: z.string(),
-    messages: z.array(z.custom<UIMessage>())
+    messages: z.array(z.custom<UIMessage>()),
+    audio: z.boolean().default(false)
   }).parse)
 
   const llm = ollama(model)
@@ -156,13 +157,13 @@ export default defineEventHandler(async (event) => {
       const { finishStream, pushStream } = audioHandler({
         model: kokoro,
         onAudioDelta: (audio) => {
-          writer.write({ type: 'data-audio', data: Buffer.from(audio).toString('base64') })
+          writer.write({ type: 'data-audio', data: Buffer.from(audio).toString('base64'), transient: true })
         }
       })
 
       for await (const chunk of uiStream) {
         writer.write(chunk)
-        if (chunk.type === 'text-delta') {
+        if (audio && chunk.type === 'text-delta') {
           pushStream(chunk.delta)
         }
       }
@@ -177,7 +178,9 @@ export default defineEventHandler(async (event) => {
         })
       }
 
-      await finishStream()
+      if (audio) {
+        await finishStream()
+      }
     },
     onFinish: async ({ messages }) => {
       await db.insert(tables.messages).values(messages.map(message => ({
