@@ -3,7 +3,7 @@ import type { DefineComponent } from 'vue'
 import { Chat } from '@ai-sdk/vue'
 import { DefaultChatTransport } from 'ai'
 import type { UIMessage } from 'ai'
-import { useClipboard } from '@vueuse/core'
+import { useClipboard, useDebounceFn } from '@vueuse/core'
 import { getTextFromMessage } from '@nuxt/ui/utils/ai'
 import ProseStreamPre from '../../components/prose/PreStream.vue'
 
@@ -15,6 +15,26 @@ const route = useRoute()
 const toast = useToast()
 const clipboard = useClipboard()
 const { model } = useModels()
+const { initContext, enqueueAudio, clearQueue } = useAudioPlayer()
+const { audioEnabled } = useAudioSettings()
+const { isListening, isSupported, toggle } = useMic({
+  onResult: (text) => {
+    input.value = input.value ? `${input.value} ${text}` : text
+    chat.stop()
+    clearQueue()
+    debouncedFn()
+  }
+})
+
+const debouncedFn = useDebounceFn(() => {
+  initContext()
+  if (input.value.trim()) {
+    chat.sendMessage({
+      text: input.value
+    })
+    input.value = ''
+  }
+}, 3000)
 
 const { data } = await useFetch(`/api/chats/${route.params.id}`, {
   cache: 'force-cache'
@@ -32,12 +52,16 @@ const chat = new Chat({
   transport: new DefaultChatTransport({
     api: `/api/chats/${data.value.id}`,
     body: {
-      model: model.value
+      model: model.value,
+      audio: audioEnabled.value
     }
   }),
   onData: (dataPart) => {
     if (dataPart.type === 'data-chat-title') {
       refreshNuxtData('chats')
+    }
+    if (dataPart.type === 'data-audio') {
+      enqueueAudio(dataPart.data as string)
     }
   },
   onError(error) {
@@ -53,6 +77,7 @@ const chat = new Chat({
 
 function handleSubmit(e: Event) {
   e.preventDefault()
+  initContext()
   if (input.value.trim()) {
     chat.sendMessage({
       text: input.value
@@ -74,6 +99,7 @@ function copy(e: MouseEvent, message: UIMessage) {
 }
 
 onMounted(() => {
+  initContext()
   if (data.value?.messages.length === 1) {
     chat.regenerate()
   }
@@ -103,7 +129,11 @@ onMounted(() => {
                 :key="`${message.id}-${part.type}-${index}${'state' in part ? `-${part.state}` : ''}`"
               >
                 <Sources v-if="part.type === 'data-source'" :sources="part.data" />
-                <Reasoning v-else-if="part.type === 'reasoning'" :text="part.text" :is-streaming="part.state !== 'done'" />
+                <Reasoning
+                  v-else-if="part.type === 'reasoning'"
+                  :text="part.text"
+                  :is-streaming="part.state !== 'done'"
+                />
                 <MDCCached
                   v-else-if="part.type === 'text'"
                   :value="part.text"
@@ -126,13 +156,27 @@ onMounted(() => {
         >
           <template #footer>
             <ModelSelect v-model="model" />
+            <div class="flex gap-3">
+              <ClientOnly>
+                <UButton
+                  v-if="isSupported"
+                  :icon="isListening ? 'lucide:mic-off' : 'lucide:mic'"
+                  :color="isListening ? 'primary' : 'neutral'"
+                  variant="ghost"
+                  @click="toggle"
+                />
+                <template #fallback>
+                  <div class="size-8" />
+                </template>
+              </ClientOnly>
 
-            <UChatPromptSubmit
-              :status="chat.status"
-              color="neutral"
-              @stop="chat.stop"
-              @reload="chat.regenerate"
-            />
+              <UChatPromptSubmit
+                :status="chat.status"
+                color="neutral"
+                @stop="chat.stop"
+                @reload="chat.regenerate"
+              />
+            </div>
           </template>
         </UChatPrompt>
       </UContainer>

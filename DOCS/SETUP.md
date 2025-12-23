@@ -48,6 +48,7 @@ REDIS_PORT=6379
 
 # AI Providers
 OLLAMA_BASE_URL="http://127.0.0.1:11434/api"
+KOKORO_API_URL="http://localhost:8880"
 
 # Security
 NUXT_SESSION_PASSWORD="password-with-at-least-32-characters"

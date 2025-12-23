@@ -4,8 +4,9 @@ let ollama: ReturnType<typeof createOllama>
 
 export function useOllama() {
   if (!ollama) {
+    const config = useRuntimeConfig()
     ollama = createOllama({
-      baseURL: process.env.OLLAMA_API_KEY
+      baseURL: config.ollama.baseUrl
     })
   }
 

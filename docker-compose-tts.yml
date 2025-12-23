@@ -1,0 +1,24 @@
+services:
+  kokoro-tts:
+    # --- CPU (Padrão) ---
+    # Use esta imagem se seu servidor NÃO tiver placa de vídeo dedicada.
+    # image: ghcr.io/remsky/kokoro-fastapi-cpu:latest
+    
+    # --- GPU (NVIDIA) ---
+    image: ghcr.io/remsky/kokoro-fastapi-gpu:latest
+    
+    container_name: kokoro-tts
+    # restart: unless-stopped
+    environment:
+      - NVIDIA_DISABLE_REQUIRE=1
+    ports:
+      - "8880:8880"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    volumes:
+      - ./kokoro_models:/app/models

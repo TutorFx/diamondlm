@@ -10,3 +10,22 @@ export type GroupPermission = ValueOf<typeof PERMISSIONS.GROUP>
 export type GuidePermission = ValueOf<typeof PERMISSIONS.GUIDE>
 export type UserPermission = ValueOf<typeof PERMISSIONS.USER>
 export type GroupMemberPermission = GroupPermission | GuidePermission
+
+declare global {
+  interface ServicesStatus {
+    database: boolean
+    redis: boolean
+    ollama: boolean
+    kokoro: boolean
+    audio: boolean
+  }
+  var __SERVICES_STATUS__: ServicesStatus | undefined
+}
+
+declare module '@nuxt/schema' {
+  interface PublicRuntimeConfig {
+    features: {
+      audio: boolean
+    }
+  }
+}
