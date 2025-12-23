@@ -13,6 +13,7 @@
 - **📚 RAG System**: Hybrid search with [pgvector](https://github.com/pgvector/pgvector), number boosting, and markdown parsing.
 - **👥 Team Management**: Hierarchical groups, granular ACL permissions, and private knowledge bases.
 - **📝 Content Engine**: Monaco Editor integration for managing technical guides and documentation.
+- **🔈 Audio System**: High-fidelity Text-to-Speech powered by Kokoro.
 
 ## 🚀 Quick Start
 
@@ -32,6 +33,7 @@ Everything you need to know about Diamond LLM.
 - **[RAG Architecture](./DOCS/RAG.md)**
 - **[Groups & Permissions](./DOCS/GROUPS.md)**
 - **[Database Seeding](./DOCS/SEEDING.md)**
+- **[Audio & Voice](./DOCS/AUDIO.md)**
 - **[Changelog](./CHANGELOG.md)**
 
 ## 💻 Tech Stack
