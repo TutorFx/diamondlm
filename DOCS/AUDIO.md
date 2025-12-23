@@ -8,7 +8,7 @@ The application provides real-time speech synthesis for AI responses.
 
 ### Powered by Kokoro
 
-We rely on [Kokoro](https://github.com/stylebert/kokoro-fastapi), a fast and high-quality TTS engine.
+We rely on [Kokoro](https://github.com/remsky/Kokoro-FastAPI), a fast and high-quality TTS engine.
 
 ### Configuration
 
