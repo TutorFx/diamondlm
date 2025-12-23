@@ -65,9 +65,9 @@ export function audioHandler(opt: AudioHandler) {
 }
 
 export async function kokoro(text: string) {
-  const KOKORO_API_URL = process.env.KOKORO_API_URL || 'http://localhost:8880/v1/audio/speech'
+  const config = useRuntimeConfig()
 
-  return await $fetch<ArrayBuffer>(KOKORO_API_URL, {
+  return await $fetch<ArrayBuffer>(config.kokoro.apiUrl, {
     method: 'POST',
     body: {
       model: 'kokoro',

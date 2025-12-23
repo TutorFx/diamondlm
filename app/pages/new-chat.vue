@@ -92,9 +92,9 @@ const quickChats = [
                 @click="toggle"
               />
 
-              <slot name="fallback">
+              <template #fallback>
                 <div class="size-8" />
-              </slot>
+              </template>
             </ClientOnly>
             <UChatPromptSubmit color="neutral" />
           </div>

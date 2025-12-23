@@ -18,6 +18,8 @@ export default defineEventHandler(async (event) => {
     id: z.string()
   }).parse)
 
+  const { kokoro: isKokoroFeatureEnabled } = useServerFeatures()
+
   const { model, messages, audio } = await readValidatedBody(event, z.object({
     model: z.string(),
     messages: z.array(z.custom<UIMessage>()),
@@ -163,7 +165,7 @@ export default defineEventHandler(async (event) => {
 
       for await (const chunk of uiStream) {
         writer.write(chunk)
-        if (audio && chunk.type === 'text-delta') {
+        if (audio && isKokoroFeatureEnabled && chunk.type === 'text-delta') {
           pushStream(chunk.delta)
         }
       }
